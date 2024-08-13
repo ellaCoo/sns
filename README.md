@@ -1,7 +1,7 @@
 # SNS
 
 ## Application Architecture
-![SystemArchitecture.drawio](doc%2FSystemArchitecture.drawio)
+![SystemArchitecture.drawio.svg](doc%2FSystemArchitecture.drawio.svg)
 
 ## Flow Chart
 
