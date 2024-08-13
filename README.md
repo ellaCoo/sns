@@ -1,5 +1,8 @@
 # SNS
 
+## Application Architecture
+![SystemArchitecture.drawio](doc%2FSystemArchitecture.drawio)
+
 ## Flow Chart
 
 1. 회원가입
