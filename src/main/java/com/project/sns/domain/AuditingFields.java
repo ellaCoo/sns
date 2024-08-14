@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 /*
 BaseTimeEntity는 모든 Entity의 상위클래스가 되어 Entity들의 createdDate, modidiedDate를 자동으로 관리하는 역할
-Jpa Entity들이 @MappedSuperClass가 선언된 클래스를 상속할 경우, 클래스의 필드드로 컬럼으로 인식하도록 함
+Jpa Entity들이 @MappedSuperClass가 선언된 클래스를 상속할 경우, 클래스의 필드를 컬럼으로 인식하도록 함
  */
 @Getter
 @EntityListeners(AuditingEntityListener.class) //BaseTimeEntity에 Auditing 기능을 포함

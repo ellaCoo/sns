@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Getter
 @Entity
 public class PostComment extends AuditingFields {
@@ -12,12 +15,13 @@ public class PostComment extends AuditingFields {
     private Long id;
 
     @Setter
-    @ManyToOne(optional = false)
+    @JoinColumn(name = "postId")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Post post;
 
     @Setter
     @JoinColumn(name = "userId")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private UserAccount userAccount;
 
     @Setter
