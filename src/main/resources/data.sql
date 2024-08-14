@@ -1,6 +1,6 @@
 -- user_account (2)
-insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('ella', 'qwer1234', 'EllaCoo', 'ella@mail.com', 'I am Ella.', now(), 'ella', now(), 'ella');
-insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('ella2', 'qwer1234', 'EllaCoo2', 'ella2@mail.com', 'I am Ella2.', now(), 'ella2', now(), 'ella2');
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('ella', 'qwer1234', 'EllaCoo', 'ella@mail.com', 'I am Ella.', '2024-01-01 16:47:05', 'ella', '2024-01-01 16:47:05', 'ella');
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('ella2', 'qwer1234', 'EllaCoo2', 'ella2@mail.com', 'I am Ella2.', '2024-01-01 16:47:05', 'ella2', '2024-01-01 16:47:05', 'ella2');
 
 -- post (50)
 insert into post (user_id, title, content, created_by, modified_by, created_at, modified_at) values ('ella', 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa.', 'In hac habitasse platea dictumst. Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat. Curabitur gravida nisi at nibh. In hac habitasse platea dictumst. Aliquam augue quam, sollicitudin vitae, consectetuer eget, rutrum at, lorem.', 'ella', 'ella', '2024-03-01 19:32:06', '2024-04-19 00:45:12');
@@ -257,6 +257,24 @@ insert into post_comment (post_id, user_id, parent_comment_id, content, created_
 insert into post_comment (post_id, user_id, parent_comment_id, content, created_at, modified_at, created_by, modified_by) values (29, 'ella2', null, 'Nulla justo.', '2024-08-01 00:00:00', '2024-08-01 00:00:00', 'ella', 'ella2');
 
 
+-- hashtag (15)
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Tunisia', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Philippines', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('United States', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Indonesia', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Latvia', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Argentina', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Brazil', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Poland', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Norway', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('South Korea', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Japan', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Zimbabwe', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Sweden', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Costa Rica', now(), now(), 'ella', 'ella');
+insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('China', now(), now(), 'ella', 'ella');
+
+
 -- post_hashtag (100)
 insert into post_hashtag (post_id, hashtag_id) values (15, 12);
 insert into post_hashtag (post_id, hashtag_id) values (49, 7);
@@ -359,19 +377,5 @@ insert into post_hashtag (post_id, hashtag_id) values (20, 4);
 insert into post_hashtag (post_id, hashtag_id) values (19, 15);
 insert into post_hashtag (post_id, hashtag_id) values (21, 13);
 
--- hashtag (15)
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Tunisia', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Philippines', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('United States', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Indonesia', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Latvia', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Argentina', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Brazil', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Poland', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Norway', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('South Korea', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Japan', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Zimbabwe', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Sweden', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('Costa Rica', now(), now(), 'ella', 'ella');
-insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified_by) values ('China', now(), now(), 'ella', 'ella');
+-- -- like (2)
+-- insert into "like" (post_id, user_account_id, created_at, modified_at, created_by, modified_by) values (28, 'ella', '2024-08-05 02:34:15', '2024-08-06 18:42:14', 'ella', 'ella');
