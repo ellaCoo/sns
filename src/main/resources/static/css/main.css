@@ -1,0 +1,28 @@
+html {
+    display: flex;
+    justify-content: center;
+}
+body {
+    width: 50%;
+    overflow: hidden;
+}
+main {
+    overflow: scroll;
+    height : 75vh;
+}
+.iconBtn img{
+    width: 45px;
+    height: auto;
+}
+ul {
+    list-style:none;
+    margin-bottom: auto; !important;
+}
+.custom-card {
+    background-color: lightgray; !important;
+    box-shadow: inset 0 0 5px; !important;
+    border: 0; !important;
+}
+.badge {
+    width: fit-content;
+}
