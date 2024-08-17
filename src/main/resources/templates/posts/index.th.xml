@@ -4,11 +4,11 @@
     <attr sel="#footer" th:replace="~{footer :: footer}" />
 
     <attr sel="main" th:object="${posts}">
-        <attr sel="#post-list" th:remove="all-but-first">
+        <attr sel="#post-list">
             <attr sel="li[0]" th:each="post : ${posts}">
                 <attr sel="div.user-id/b" th:text="${post.userId}" />
                 <attr sel="div.created-at/time" th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}" />
-                <attr sel="div.post-detail" th:href="@{'/posts/' + ${post.id}}" />
+                <attr sel="a.post-title-content" th:href="@{'/posts/' + ${post.id}}" />
                 <attr sel="b.title" th:text="${post.title}"/>
                 <attr sel="span.content" th:text="${post.content}"/>
             </attr>
@@ -17,9 +17,10 @@
         <attr sel="#pagination">
             <attr sel="li[0]/a"
                   th:text="'More'"
-                  th:href="@{/posts(page=${posts.number + 1}, sort=${param.sort}, searchType=${param.searchType}, searchValue=${param.searchValue})}"
-                  th:class="'page-link' + (${posts.number} >= ${posts.totalPages - 1} ? ' disabled' : '')"
             />
+<!--            th:class="'page-link' + (${posts.number} >= ${posts.totalPages - 1} ? ' disabled' : '')"-->
+<!--            th:href="@{/posts(page=${posts.number + 1})}"-->
+
         </attr>
     </attr>
 </thlogic>
