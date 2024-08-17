@@ -15,6 +15,10 @@ public record UserAccountDto(
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
+    public static UserAccountDto of(String userId, String userPassword, String email, String nickname, String memo) {
+        return new UserAccountDto(userId, userPassword, email, nickname, memo, null, null, null, null);
+    }
+
     public static UserAccountDto fromEntity(UserAccount entity) {
         return new UserAccountDto(
                 entity.getUserId(),
