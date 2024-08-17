@@ -44,9 +44,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-security' //spring security
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' //spring security
+    testImplementation 'org.springframework.security:spring-security-test' //spring security
 
     // queryDSL 설정
     implementation "com.querydsl:querydsl-jpa:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
