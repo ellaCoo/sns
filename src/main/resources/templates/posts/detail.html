@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Ella Lee">
+    <title>SNS Detail</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link href="/css/main.css" rel="stylesheet">
+    <link href="/css/search-bar.css" rel="stylesheet">
+    <link href="/css/posts/table-header.css" rel="stylesheet">
+</head>
+
+<body>
+
+<header id="header">
+    Header 삽입부
+    <hr>
+</header>
+
+<main class="container bg-dark">
+    <div class="row card p-2 mx-1 bg-light" style="height: inherit;">
+        <div class="row m-2 d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-dark btn-sm col-1 mx-1">수정</button>
+            <button type="button" class="btn btn-outline-dark btn-sm col-1 mx-1">삭제</button>
+        </div>
+        <div id="post-list" class="card-body">
+            <div class="mb-2 feed-list">
+                <div class="d-flex">
+                    <div class="col-2 text-dark pt-3 position-relative">
+                        <div class="user-id"><b>작성자</b></div>
+                        <div class="created-at initialism"><time>2024-01-01</time></div>
+                        <a role="button" id="postLikeBtn" class="iconSmallBtn position-absolute top-0 end-0 p-1">
+                            <img alt="like" src="/images/icon-heart.png">
+                        </a>
+                    </div>
+                    <div class="card card-body custom-card">
+                        <div class="mb-2 post-title-content text-reset">
+                            <b class="title">제목</b><br>
+                            <span class="content">내용</span>
+                        </div>
+                        <div class="d-flex">
+                            <span class="badge text-bg-secondary mx-1"><a class="text-reset">#hashtag</a></span>
+                            <span class="badge text-bg-secondary mx-1"><a class="text-reset">#test</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <ul id="post-comments" class="row">
+                <li class="parent-comment">
+                    <form class="comment-delete-form">
+                        <input type="hidden" class="post-id">
+                        <div class="row">
+                            <div>
+                                <strong>Ella2</strong>
+                                <small><time>2024-01-01</time></small>
+                                <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                                <p class="mb-1 initialism" >
+                                    Test Row Test Row test djfdj roiwe foi weifj.<br>
+                                    Lorem ipsum dolor sit ameasdasdafaefw doiwhd qoiwdhqwoi asdnoqiwhd qodt
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+
+                    <ul class="row">
+                        <li class="child-comment">
+                            <form class="comment-delete-form">
+                                <input type="hidden" class="post-id">
+                                <div class="row">
+                                    <div>
+                                        <strong>Ella2</strong>
+                                        <small><time>2024-01-01</time></small>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                                        <p class="mb-1 initialism" >
+                                            Test Row Test Row test djfdj roiwe foi weifj.<br>
+                                            Lorem ipsum dolor sit ameasdasdafaefw doiwhd qoiwdhqwoi asdnoqiwhd qodt
+                                        </p>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                    </ul>
+
+                    <div class="row">
+                        <details class="col-md-10 col-lg-9 mb-4">
+                            <summary>댓글 달기</summary>
+                            <form class="comment-form">
+                                <input type="hidden" class="post-id">
+                                <input type="hidden" class="parent-comment-id">
+                                <textarea class="form-control comment-textbox" placeholder="댓글 쓰기.." rows="2" required></textarea>
+                                <button class="form-control btn btn-primary mt-2" type="submit">쓰기</button>
+                            </form>
+                        </details>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <hr>
+    Footer 삽입부
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+</html>
