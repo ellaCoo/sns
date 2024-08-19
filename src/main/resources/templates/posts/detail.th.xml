@@ -4,6 +4,7 @@
     <attr sel="#footer" th:replace="~{footer :: footer}" />
 
     <attr sel="main">
+        <attr sel="#editPostBtn" th:href="'/posts/' + ${post.id} + '/edit'" th:method="get"/>
         <attr sel="#post-list">
             <attr sel="div[0]" th:object="${post}">
                 <attr sel="div.user-id/b" th:text="${post.userId}" />

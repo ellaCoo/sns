@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<thlogic>
+    <attr sel="#header" th:replace="~{header :: header}" />
+    <attr sel="#footer" th:replace="~{footer :: footer}" />
+
+    <attr sel="main">
+        <attr sel="#post-form" th:action="${formStatus?.update} ? '/posts/' + ${post.id} + '/edit' : '/posts/form'" th:method="post">
+            <attr sel="#postTitle" th:field="${post.title}"/>
+            <attr sel="#postContent" th:field="${post.content}"/>
+
+            <attr sel="#post-date-visible" th:if="${formStatus?.update}">
+                <attr sel="div.created-at/time" th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}" />
+                <attr sel="div.modified-at/time" th:datetime="${post.modifiedAt}" th:text="${#temporals.format(post.modifiedAt, 'yyyy-MM-dd HH:mm')}" />
+            </attr>
+
+            <attr sel="#exitEditPostBtn" th:href="@{'/posts/' + ${post.id}}" />
+        </attr>
+    </attr>
+</thlogic>
