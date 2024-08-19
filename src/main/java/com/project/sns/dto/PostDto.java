@@ -17,6 +17,9 @@ public record PostDto(
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
+    public static PostDto of(UserAccountDto userAccountDto, String title, String content) {
+        return new PostDto(null, userAccountDto, title, content, null, null, null, null);
+    }
     public static PostDto fromEntity(Post entity) {
         return new PostDto(
                 entity.getId(),

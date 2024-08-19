@@ -11,15 +11,16 @@ public record PostResponse(
         String title,
         String content,
         LocalDateTime createdAt,
-        String userId
-) {
+        String userId,
+        LocalDateTime modifiedAt) {
     public static PostResponse fromDto(PostDto dto) {
         return new PostResponse(
                 dto.id(),
                 dto.title(),
                 dto.content(),
                 dto.createdAt(),
-                dto.userAccountDto().userId()
+                dto.userAccountDto().userId(),
+                dto.modifiedAt()
         );
     }
 }
