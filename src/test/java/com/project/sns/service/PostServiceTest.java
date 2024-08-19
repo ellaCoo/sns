@@ -1,6 +1,9 @@
 package com.project.sns.service;
 
+import com.project.sns.domain.Post;
+import com.project.sns.domain.UserAccount;
 import com.project.sns.dto.PostDto;
+import com.project.sns.dto.UserAccountDto;
 import com.project.sns.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -41,5 +44,117 @@ public class PostServiceTest {
         // Then
         assertThat(posts).isEmpty();
         then(postRepository).should().findAll(pageable);
+    }
+
+    @DisplayName("포스트를 조회하면, 포스트를 반환한다.")
+    @Test
+    void givenPostId_whenSearchingPost_thenReturnsPost() {
+        // Given
+        Long postId = 1L;
+        Post post = createPost();
+        given(postRepository.findById(postId)).willReturn(Optional.of(post));
+
+        // When
+        PostDto dto = sut.getPost(postId);
+
+        // Then
+        // assertThat : assertj 라이브러리를 사용하여 dto 객체가 예상대로 생성되었는지 검증
+        assertThat(dto)
+                .hasFieldOrPropertyWithValue("title", post.getTitle())
+                .hasFieldOrPropertyWithValue("content", post.getContent());
+        then(postRepository).should().findById(postId); //모의된 메서드 호출을 검증
+    }
+
+    @DisplayName("포스트가 없으면, 예외를 던진다.")
+    @Test
+    void givenNoneExistentPostId_whenSearchingPost_thenThrowsException() {
+        // Given
+        Long postId = 1L;
+        given(postRepository.findById(postId)).willReturn(Optional.empty());
+
+        // When
+        Throwable t = catchThrowable(() -> sut.getPost(postId));
+
+        // Then
+        assertThat(t)
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("포스트가 없습니다 - postId: " + postId);
+        then(postRepository).should().findById(postId);
+    }
+
+    @DisplayName("포스트의 수정 정보를 입력하면, 포스트를 수정한다.")
+    @Test
+    void givenModifiedPostInfo_whenUpdatingPost_thenUpdatesPost() {
+        // Given
+        Long postId = 1L;
+        Post post = createPost();
+        PostDto dto = createPostDto();
+
+        given(postRepository.getReferenceById(postId)).willReturn(post);
+
+        // When
+        sut.updatePost(postId, dto);
+
+        // Then
+        assertThat(post)
+                .hasFieldOrPropertyWithValue("title", dto.title())
+                .hasFieldOrPropertyWithValue("content", dto.content());
+        then(postRepository).should().getReferenceById(postId);
+    }
+
+    @DisplayName("없는 포스트의 수정 정보를 입력하면, 경고 로그를 찍고 아무것도 하지 않는다.")
+    @Test
+    void givenNoneExistentPostInfo_whenUpdatingPost_thenLogsWarningAndDoesNothing() {
+        // Given
+        Long postId = 1L;
+        PostDto dto = createPostDto();
+        given(postRepository.getReferenceById(postId)).willThrow(EntityNotFoundException.class);
+
+        // When
+        sut.updatePost(postId, dto);
+
+        // Then
+        then(postRepository).should().getReferenceById(postId);
+    }
+
+    //TODO: 인증 구현 후 수정 필요
+//    @DisplayName("포스트 작성자가 아닌 사람이 수정 정보를 입력하면, 아무것도 하지 않는다.")
+
+
+    private Post createPost() {
+        return Post.of(
+                createUserAccount(),
+                "title",
+                "content"
+        );
+    }
+
+    private UserAccount createUserAccount() {
+        return UserAccount.of(
+                "ella",
+                "password",
+                "ella@email.com",
+                "Ella",
+                null,
+                null
+        );
+    }
+
+    private PostDto createPostDto() {
+        return PostDto.of(
+                createUserAccountDto(),
+                "title",
+                "content"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                "ella",
+                "pw",
+                "ella@mail.com",
+                "ella",
+                "memo"
+        );
     }
 }
