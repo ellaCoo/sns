@@ -15,6 +15,7 @@ public interface PostRepository extends
         QuerydslPredicateExecutor<Post>, // entity 안에 있는 모든 필드에 대한 기본 검색 기능 추가
         QuerydslBinderCustomizer<QPost>  // 부분 검색
 {
+    void deleteByIdAndUserAccount_UserId(Long postId, String userId);
     @Override
     default void customize(QuerydslBindings bindings, QPost root) {
         bindings.excludeUnlistedProperties(true);

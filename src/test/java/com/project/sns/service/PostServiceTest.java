@@ -19,8 +19,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 
 @DisplayName("비즈니스 로직 - 포스트")
 @ExtendWith(MockitoExtension.class) //Mockito를 사용하여 테스트를 작성할 때 필요한 확장 기능을 제공
@@ -115,6 +114,21 @@ public class PostServiceTest {
 
         // Then
         then(postRepository).should().getReferenceById(postId);
+    }
+
+    @DisplayName("포스트의 ID를 입력하면, 포스트를 삭제한다.")
+    @Test
+    void givenPostId_whenDeletingPost_thenDeletesPost() {
+        // Given
+        Long postId = 1L;
+        String userId = "ella";
+        willDoNothing().given(postRepository).deleteByIdAndUserAccount_UserId(postId, userId);
+
+        // When
+        sut.deletePost(1L, userId);
+
+        // Then
+        then(postRepository).should().deleteByIdAndUserAccount_UserId(postId, userId);
     }
 
     //TODO: 인증 구현 후 수정 필요

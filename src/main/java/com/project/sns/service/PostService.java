@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
@@ -42,5 +44,10 @@ public class PostService {
         } catch (EntityNotFoundException e) {
             log.warn("포스트 업데이트 실패. 포스트를 수정하는데 필요한 정보를 찾을 수 없습니다.");
         }
+    }
+
+    public void deletePost(long postId, String userId) {
+        // TODO: hashtag 기능 추가 시 함께 삭제 되도록
+        postRepository.deleteByIdAndUserAccount_UserId(postId, userId);
     }
 }

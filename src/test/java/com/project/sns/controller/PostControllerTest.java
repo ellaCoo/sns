@@ -157,6 +157,26 @@ class PostControllerTest {
         then(postService).should().updatePost(eq(postId), any(PostDto.class));
     }
 
+    @DisplayName("[view][POST] 포스트 삭제 - 정상 호출")
+    @Test
+    void givenPostIdToDelete_whenRequesting_thenDeletePost() throws Exception {
+        // Given
+        long postId = 1L;
+        String userId = "ellaTest";
+        willDoNothing().given(postService).deletePost(postId, userId);
+
+        // When & Then
+        mvc.perform(
+                post("/posts/" + postId + "/delete")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .with(csrf())
+        )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/posts"))
+                .andExpect(redirectedUrl("/posts"));
+        then(postService).should().deletePost(postId, userId);
+    }
+
     private PostDto createPostDto() {
     return PostDto.of(
             createUserAccountDto(),

@@ -83,4 +83,13 @@ public class PostController {
         map.addAttribute("post", post);
         return "posts/detail";
     }
+
+    @PostMapping("/{postId}/delete")
+    public String deletePost(
+            @PathVariable Long postId
+    ) {
+        UserAccountDto userAccountDto = userAccountService.searchUser("ella").get();
+        postService.deletePost(postId, userAccountDto.userId());
+        return "redirect:/posts";
+    }
 }
