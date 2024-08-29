@@ -1,8 +1,11 @@
 package com.project.sns.service;
 
 import com.project.sns.domain.Post;
+import com.project.sns.domain.UserAccount;
 import com.project.sns.dto.PostDto;
+import com.project.sns.dto.UserAccountDto;
 import com.project.sns.repository.PostRepository;
+import com.project.sns.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,7 @@ import java.util.Set;
 @Transactional
 @Service
 public class PostService {
+    private final UserAccountRepository userAccountRepository;
     private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
@@ -35,12 +39,13 @@ public class PostService {
     public void updatePost(Long postId, PostDto dto) {
         try {
             Post post = postRepository.getReferenceById(postId);
-            if (dto.title() != null) {
-                post.setTitle(dto.title());
+            UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+
+            if (post.getUserAccount().equals(userAccount)) {
+                if (dto.title() != null) post.setTitle(dto.title());
+                if (dto.content() != null) post.setContent(dto.content());
             }
-            if (dto.content() != null) {
-                post.setContent(dto.content());
-            }
+            // TODO: hashtag 기능 추가 시 함께 업데이트 되도록
         } catch (EntityNotFoundException e) {
             log.warn("포스트 업데이트 실패. 포스트를 수정하는데 필요한 정보를 찾을 수 없습니다.");
         }
