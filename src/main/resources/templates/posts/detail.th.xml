@@ -4,7 +4,8 @@
     <attr sel="#footer" th:replace="~{footer :: footer}" />
 
     <attr sel="main">
-        <attr sel="#delete-post-form" th:action="'/posts/' + ${post.id} + '/delete'" th:method="post">
+        <attr sel="#delete-post-form"  th:if="${#authorization.expression('isAuthenticated()')} and ${post.userId} == ${#authentication.name}"
+              th:action="'/posts/' + ${post.id} + '/delete'" th:method="post">
             <attr sel="#editPostBtn" th:href="'/posts/' + ${post.id} + '/edit'" th:method="get"/>
         </attr>
 

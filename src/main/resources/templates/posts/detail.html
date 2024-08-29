@@ -22,7 +22,7 @@
 
 <main class="container bg-dark">
     <div class="row card p-2 mx-1 bg-light" style="height: inherit;">
-        <form id="delete-post-form">
+        <form id="delete-post-form" onsubmit="return confirmPostDeleteSubmit()">
             <div class="row m-2 d-flex justify-content-end">
                 <a type="button" id="editPostBtn" class="btn btn-outline-dark btn-sm col-1 mx-1">수정</a>
                 <button type="submit" id="deletePostBtn" class="btn btn-outline-dark btn-sm col-1 mx-1">삭제</button>
@@ -111,5 +111,10 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    function confirmPostDeleteSubmit() {
+    return confirm("게시글을 삭제 하시겠습니까?");
+}
+</script>
 </body>
 </html>
