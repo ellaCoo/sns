@@ -20,6 +20,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -91,7 +94,8 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.content").isArray()); // 반환된 내용이 배열인지 확인
     }
 
-    @DisplayName("[view][GET] 포스트 페이지 반환 - 정상 호출") //TODO: 인증된 사용자 추가 필요
+    @WithMockUser // user정보를 모킹해서 넣어줌
+    @DisplayName("[view][GET] 포스트 페이지 반환 - 정상 호출")
     @Test
     void givenAuthorizedUser_whenRequestingPostView_thenReturnsPostView() throws Exception {
         // Given
@@ -110,7 +114,22 @@ class PostControllerTest {
         then(postCommentService).should().searchPostComments(postId);
     }
 
-    @DisplayName("[view][GET] 포스트 수정 페이지 반환 - 정상 호출") //TODO: 인증된 사용자 추가 필요
+    @DisplayName("[view][GET] 포스트 페이지 반환 - 인증 없을 땐 로그인 페이지로 이동")
+    @Test
+    void givenNothing_whenRequestingPostView_thenReturnsPostView() throws Exception {
+        // Given
+        Long postId = 1L;
+
+        // When & Then
+        mvc.perform(get("/posts/" + postId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+        then(postService).shouldHaveNoInteractions(); // postService 모의 객체가 테스트 중에 어떤 메서드도 호출되지 않았음을 확인
+        then(postCommentService).shouldHaveNoInteractions();
+    }
+
+    @WithMockUser // user정보를 모킹해서 넣어줌
+    @DisplayName("[view][GET] 포스트 수정 페이지 반환 - 정상 호출")
     @Test
     void givenAuthorizedUser_whenRequestingPostUpdateView_thenReturnsPostEditView() throws Exception {
         // Given
@@ -128,6 +147,20 @@ class PostControllerTest {
         then(postService).should().getPost(postId);
     }
 
+    @DisplayName("[view][GET] 포스트 수정 페이지 반환 - 인증 없을 땐 로그인 페이지로 이동")
+    @Test
+    void givenNothing_whenRequestingPostUpdateView_thenReturnsPostEditView() throws Exception {
+        // Given
+        Long postId = 1L;
+
+        // When & Then
+        mvc.perform(get("/posts/" + postId + "/edit"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+        then(postService).shouldHaveNoInteractions();
+    }
+
+    @WithUserDetails(value = "ellaTest", setupBefore = TestExecutionEvent.TEST_EXECUTION) // TestSecurityConfig에서 지정한 유저정보 사용 가능 | TEST_EXECUTION:테스트 직전에 셋업해라
     @DisplayName("[view][POST] 포스트 수정 - 정상 호출")
     @Test
     void givenUpdatedPostInfo_whenRequesting_thenUpdatePost() throws Exception {
@@ -157,6 +190,7 @@ class PostControllerTest {
         then(postService).should().updatePost(eq(postId), any(PostDto.class));
     }
 
+    @WithUserDetails(value = "ellaTest", setupBefore = TestExecutionEvent.TEST_EXECUTION) // TestSecurityConfig에서 지정한 유저정보 사용 가능 | TEST_EXECUTION:테스트 직전에 셋업해라
     @DisplayName("[view][POST] 포스트 삭제 - 정상 호출")
     @Test
     void givenPostIdToDelete_whenRequesting_thenDeletePost() throws Exception {

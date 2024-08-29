@@ -13,7 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 @DataJpaTest: repository 객체를 의존주입 받을 수 있게 해준다. | @Transactional 을 갖고있어서 테스트 이후 자동 롤백 가능
  */
 @DisplayName("JPA 연결 테스트")
-@Import(JpaConfig.class)
+@Import(JpaRepositoryTest.TestJpaConfig.class)
 @DataJpaTest
 public class JpaRepositoryTest {
 
@@ -61,7 +65,7 @@ public class JpaRepositoryTest {
         String username = "ella";
         UserAccount userAccount = userAccountRepository.findById(username).orElseThrow();
         Post post = Post.of(userAccount, "new post", "new content");
-        // TODO: 개발 진행 단계에 따라 테스트 추가 예정 (해시코드)
+        // TODO: 개발 진행 단계에 따라 테스트 추가 예정 (해시태그)
 
         // When
         postRepository.save(post);
@@ -77,7 +81,7 @@ public class JpaRepositoryTest {
         Post post = postRepository.findById(1L).orElseThrow();
         String updatedTitle = "updatedTitle";
         post.setTitle(updatedTitle);
-        // TODO: 개발 진행 단계에 따라 테스트 추가 예정 (해시코드)
+        // TODO: 개발 진행 단계에 따라 테스트 추가 예정 (해시태그)
 
         // When
         postRepository.saveAndFlush(post);
@@ -111,4 +115,14 @@ public class JpaRepositoryTest {
                 .isEqualTo(previousPostCommentCnt - deletedCommentsSize);
     }
 
+    // insert test시 auditing 무시하도록
+    @EnableJpaAuditing
+    @TestConfiguration // 빈으로 등록하되, 테스트할때만 빈으로 등록해라
+    // jpa에서 오디팅에서 security로부터의 영향에서 자유로워질 수 있게 따로 auditorAware를 테스트 전용 config로 등록해서 사용
+    static class TestJpaConfig {
+        @Bean
+        AuditorAware<String> auditorAware() {
+            return () -> Optional.of("ella");
+        }
+    }
 }

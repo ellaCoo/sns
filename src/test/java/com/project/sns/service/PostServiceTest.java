@@ -5,6 +5,7 @@ import com.project.sns.domain.UserAccount;
 import com.project.sns.dto.PostDto;
 import com.project.sns.dto.UserAccountDto;
 import com.project.sns.repository.PostRepository;
+import com.project.sns.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -29,8 +31,10 @@ public class PostServiceTest {
 
     @Mock //PostRepository를 Mock 객체로 생성
     private PostRepository postRepository; //이 Mock 객체는 실제 데이터베이스나 외부 시스템과 상호작용하지 않고, 테스트 시에 정의된 동작만을 수행
+    @Mock
+    private UserAccountRepository userAccountRepository;
 
-    @DisplayName("포스트 페이지를 호출하면 페이징 처리하여 반환한다.")
+    @DisplayName("getPost - 포스트 페이지를 호출하면 페이징 처리하여 반환한다.")
     @Test
     void givenNoParameters_whenGetPosts_thenReturnsArticlePage() {
         // Given
@@ -45,7 +49,7 @@ public class PostServiceTest {
         then(postRepository).should().findAll(pageable);
     }
 
-    @DisplayName("포스트를 조회하면, 포스트를 반환한다.")
+    @DisplayName("getPost - 포스트를 조회하면, 포스트를 반환한다.")
     @Test
     void givenPostId_whenSearchingPost_thenReturnsPost() {
         // Given
@@ -64,7 +68,7 @@ public class PostServiceTest {
         then(postRepository).should().findById(postId); //모의된 메서드 호출을 검증
     }
 
-    @DisplayName("포스트가 없으면, 예외를 던진다.")
+    @DisplayName("getPost - 포스트가 없으면, 예외를 던진다.")
     @Test
     void givenNoneExistentPostId_whenSearchingPost_thenThrowsException() {
         // Given
@@ -81,42 +85,61 @@ public class PostServiceTest {
         then(postRepository).should().findById(postId);
     }
 
-    @DisplayName("포스트의 수정 정보를 입력하면, 포스트를 수정한다.")
+    @DisplayName("updatePost - 포스트의 수정 정보를 입력하면, 포스트를 수정한다.")
     @Test
     void givenModifiedPostInfo_whenUpdatingPost_thenUpdatesPost() {
         // Given
-        Long postId = 1L;
         Post post = createPost();
         PostDto dto = createPostDto();
 
-        given(postRepository.getReferenceById(postId)).willReturn(post);
+        given(postRepository.getReferenceById(dto.id())).willReturn(post);
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(dto.userAccountDto().toEntity());
 
         // When
-        sut.updatePost(postId, dto);
+        sut.updatePost(dto.id(), dto);
 
         // Then
         assertThat(post)
                 .hasFieldOrPropertyWithValue("title", dto.title())
                 .hasFieldOrPropertyWithValue("content", dto.content());
-        then(postRepository).should().getReferenceById(postId);
+        then(postRepository).should().getReferenceById(dto.id());
     }
 
-    @DisplayName("없는 포스트의 수정 정보를 입력하면, 경고 로그를 찍고 아무것도 하지 않는다.")
+    @DisplayName("updatePost - 없는 포스트의 수정 정보를 입력하면, 경고 로그를 찍고 아무것도 하지 않는다.")
     @Test
     void givenNoneExistentPostInfo_whenUpdatingPost_thenLogsWarningAndDoesNothing() {
         // Given
-        Long postId = 1L;
         PostDto dto = createPostDto();
-        given(postRepository.getReferenceById(postId)).willThrow(EntityNotFoundException.class);
+        given(postRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
 
         // When
-        sut.updatePost(postId, dto);
+        sut.updatePost(dto.id(), dto);
 
         // Then
-        then(postRepository).should().getReferenceById(postId);
+        then(postRepository).should().getReferenceById(dto.id());
+        then(userAccountRepository).shouldHaveNoInteractions();
     }
 
-    @DisplayName("포스트의 ID를 입력하면, 포스트를 삭제한다.")
+    @DisplayName("updatePost - 포스트 작성자가 아닌 사람이 수정 정보를 입력하면, 아무 것도 하지 않는다.")
+    @Test
+    void givenModifiedPostInfoWithDifferentUser_whenUpdatingPost_thenDoesNothing() {
+        // Given
+        Long differentPostId = 10L;
+        Post differentPost = createPost(differentPostId);
+        differentPost.setUserAccount(createUserAccount("TEST MAN"));
+        PostDto dto = createPostDto(); // user: ella
+        given(postRepository.getReferenceById(differentPostId)).willReturn(differentPost);
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(dto.userAccountDto().toEntity());
+
+        // When
+        sut.updatePost(differentPostId, dto);
+
+        // Then
+        then(postRepository).should().getReferenceById(differentPostId);
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
+    }
+
+    @DisplayName("deletePost - 포스트의 ID를 입력하면, 포스트를 삭제한다.")
     @Test
     void givenPostId_whenDeletingPost_thenDeletesPost() {
         // Given
@@ -131,21 +154,28 @@ public class PostServiceTest {
         then(postRepository).should().deleteByIdAndUserAccount_UserId(postId, userId);
     }
 
-    //TODO: 인증 구현 후 수정 필요
-//    @DisplayName("포스트 작성자가 아닌 사람이 수정 정보를 입력하면, 아무것도 하지 않는다.")
-
-
     private Post createPost() {
-        return Post.of(
+        return createPost(1L);
+    }
+
+    private Post createPost(Long id) {
+        Post post = Post.of(
                 createUserAccount(),
                 "title",
                 "content"
         );
+        ReflectionTestUtils.setField(post, "id", id);
+
+        return post;
     }
 
     private UserAccount createUserAccount() {
+        return createUserAccount("ella");
+    }
+
+    private UserAccount createUserAccount(String userId) {
         return UserAccount.of(
-                "ella",
+                userId,
                 "password",
                 "ella@email.com",
                 "Ella",

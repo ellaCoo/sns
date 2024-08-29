@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Entity
@@ -51,5 +48,18 @@ public class Post extends AuditingFields {
 
     public static Post of(UserAccount userAccount, String title, String content) {
         return new Post(userAccount, title, content);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // 객체 동등성을 비교하는 메서드, 'id' 필드 기준으로 비교
+        if (this == o) return true;
+        if (!(o instanceof Post that)) return false;
+        return this.getId() != null && this.getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId());
     }
 }
