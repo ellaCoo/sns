@@ -154,6 +154,28 @@ public class PostServiceTest {
         then(postRepository).should().deleteByIdAndUserAccount_UserId(postId, userId);
     }
 
+    @DisplayName("createPost - 포스트 정보를 입력하면, 포스트를 생성한다.")
+    @Test
+    void givenPostId_whenSavingPost_thenSavesPost() {
+        // Given
+        PostDto dto = createPostDto();
+        Post post = createPost();
+
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
+        given(postRepository.save(any(Post.class))).willReturn(post);
+
+        // When
+        PostDto result = sut.createPost(dto);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.title()).isEqualTo(post.getTitle());
+        assertThat(result.content()).isEqualTo(post.getContent());
+
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
+        then(postRepository).should().save(any(Post.class));
+    }
+
     private Post createPost() {
         return createPost(1L);
     }

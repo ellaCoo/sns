@@ -13,7 +13,7 @@
                 <attr sel="div.modified-at/time" th:datetime="${post.modifiedAt}" th:text="${#temporals.format(post.modifiedAt, 'yyyy-MM-dd HH:mm')}" />
             </attr>
 
-            <attr sel="#exitEditPostBtn" th:href="@{'/posts/' + ${post.id}}" />
+            <attr sel="#exitEditPostBtn" th:href="${formStatus?.update} ? @{'/posts/' + ${post.id}} : '/posts'" />
         </attr>
     </attr>
 </thlogic>

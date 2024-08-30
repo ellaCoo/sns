@@ -51,8 +51,17 @@ public class PostService {
         }
     }
 
-    public void deletePost(long postId, String userId) {
+    public void deletePost(Long postId, String userId) {
         // TODO: hashtag 기능 추가 시 함께 삭제 되도록
         postRepository.deleteByIdAndUserAccount_UserId(postId, userId);
+    }
+
+    public PostDto createPost(PostDto dto) {
+        // TODO: hashtag 기능 추가 시 함께 저장 되도록
+        UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+
+        Post post = dto.toEntity(userAccount);
+        post = postRepository.save(post);
+        return PostDto.fromEntity(post);
     }
 }
