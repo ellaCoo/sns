@@ -211,6 +211,47 @@ class PostControllerTest {
         then(postService).should().deletePost(postId, userId);
     }
 
+    @WithMockUser
+    @DisplayName("[view][GET] 새 포스트 작성 페이지")
+    @Test
+    void givenNothing_whenRequesting_thenReturnsNewPostPage() throws Exception {
+        // Given
+
+        // When & Then
+        mvc.perform(get("/posts/form"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("posts/form"))
+                .andExpect(model().attributeExists("post"))
+                .andExpect(model().attribute("post", PostResponse.of("")))
+                .andExpect(model().attributeExists("formStatus"))
+                .andExpect(model().attribute("formStatus", FormStatus.CREATE));
+    }
+
+
+    @WithUserDetails(value = "ellaTest", setupBefore = TestExecutionEvent.TEST_EXECUTION) // TestSecurityConfig에서 지정한 유저정보 사용 가능 | TEST_EXECUTION:테스트 직전에 셋업해라
+    @DisplayName("[view][POST] 새 포스트 등록 - 정상 호출")
+    @Test
+    void givenNewPostInfo_whenRequesting_thenSavesNewPost() throws Exception {
+        // Given
+        PostRequest postRequest = PostRequest.of("new title", "new content");
+        given(postService.createPost(any(PostDto.class))).willReturn(createPostDto());
+
+        // When & Then
+        mvc.perform(
+                post("/posts/form")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .content(formDataEncoder.encode(postRequest))
+                        .with(csrf())
+        )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("posts/detail"))
+                .andExpect(model().attributeExists("post"));
+        then(postService).should().createPost(any(PostDto.class));
+    }
+
+
     private PostDto createPostDto() {
     return PostDto.of(
             createUserAccountDto(),
