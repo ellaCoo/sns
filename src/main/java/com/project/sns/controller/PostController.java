@@ -1,19 +1,16 @@
 package com.project.sns.controller;
 
-import com.project.sns.domain.Post;
 import com.project.sns.domain.constant.FormStatus;
 import com.project.sns.dto.PostDto;
-import com.project.sns.dto.UserAccountDto;
 import com.project.sns.dto.request.PostRequest;
-import com.project.sns.dto.response.PostCommentDto;
+import com.project.sns.dto.PostCommentDto;
 import com.project.sns.dto.response.PostCommentResponse;
 import com.project.sns.dto.response.PostResponse;
+import com.project.sns.dto.response.PostWithCommentsResponse;
 import com.project.sns.dto.security.BoardPrincipal;
-import com.project.sns.repository.UserAccountRepository;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
 import com.project.sns.service.UserAccountService;
-import jakarta.servlet.http.HttpServlet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -54,13 +51,9 @@ public class PostController {
     public String postPage(
             @PathVariable Long postId,
             ModelMap map) {
-        PostResponse post = PostResponse.fromDto(postService.getPost(postId));
-        List<PostCommentDto> temp = postCommentService.searchPostComments(postId);
-        List<PostCommentResponse> postComments = temp.stream()
-                .map(PostCommentResponse::fromDto)
-                .toList();
-        map.addAttribute("post", post);
-        map.addAttribute("comments", postComments);
+        PostWithCommentsResponse postWithComments = PostWithCommentsResponse
+                .fromDto(postService.getPost(postId), postCommentService.searchPostComments(postId));
+        map.addAttribute("postWithComments", postWithComments);
 
         return "posts/detail";
     }
@@ -83,9 +76,7 @@ public class PostController {
             ModelMap map) {
         postService.updatePost(postId, postRequest.toDto(boardPrincipal.toDto()));
 
-        PostResponse post = PostResponse.fromDto(postService.getPost(postId));
-        map.addAttribute("post", post);
-        return "posts/detail";
+        return "redirect:/posts/" + postId;
     }
 
     @PostMapping("/{postId}/delete")
@@ -108,13 +99,12 @@ public class PostController {
 
     @PostMapping("/form")
     public String createPost(
-        @AuthenticationPrincipal BoardPrincipal boardPrincipal,
-        PostRequest postRequest,
-        ModelMap map) {
-            PostDto postDto = postService.createPost(postRequest.toDto(boardPrincipal.toDto()));
-            PostResponse post = PostResponse.fromDto(postDto);
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            PostRequest postRequest,
+            ModelMap map
+    ) {
+        PostDto postDto = postService.createPost(postRequest.toDto(boardPrincipal.toDto()));
 
-            map.addAttribute("post", post);
-            return "posts/detail";
+        return "redirect:/posts/" + postDto.id();
     }
 }

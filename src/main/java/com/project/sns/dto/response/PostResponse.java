@@ -12,22 +12,25 @@ public record PostResponse(
         String content,
         LocalDateTime createdAt,
         String userId,
-        LocalDateTime modifiedAt) {
+        String nickname,
+        LocalDateTime modifiedAt
+) {
 
     public static PostResponse of(String s) {
-        return PostResponse.of(null, s, s, null, s, null);
+        return PostResponse.of(null, s, s, null, s, s, null);
     }
-    public static PostResponse of(Long id, String title, String content, LocalDateTime createdAt, String userId, LocalDateTime modifiedAt) {
-        return new PostResponse(id, title, content, createdAt, userId, modifiedAt);
+    public static PostResponse of(Long id, String title, String content, LocalDateTime createdAt, String userId, String nickname, LocalDateTime modifiedAt) {
+        return new PostResponse(id, title, content, createdAt, userId, nickname, modifiedAt);
     }
 
     public static PostResponse fromDto(PostDto dto) {
-        return new PostResponse(
+        return PostResponse.of(
                 dto.id(),
                 dto.title(),
                 dto.content(),
                 dto.createdAt(),
                 dto.userAccountDto().userId(),
+                dto.userAccountDto().nickname(),
                 dto.modifiedAt()
         );
     }
