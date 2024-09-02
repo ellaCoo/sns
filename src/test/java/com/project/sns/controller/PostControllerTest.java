@@ -6,15 +6,12 @@ import com.project.sns.dto.PostDto;
 import com.project.sns.dto.UserAccountDto;
 import com.project.sns.dto.request.PostRequest;
 import com.project.sns.dto.response.PostResponse;
-import com.project.sns.repository.PostRepository;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
-import com.project.sns.service.UserAccountService;
 import com.project.sns.util.FormDataEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -25,10 +22,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
@@ -101,15 +95,14 @@ class PostControllerTest {
         // Given
         Long postId = 1L;
         given(postService.getPost(postId)).willReturn(createPostDto());
-        given(postCommentService.searchPostComments(postId)).willReturn(new ArrayList<>());
+        given(postCommentService.searchPostComments(postId)).willReturn(new TreeSet<>());
 
         // When & Then
         mvc.perform(get("/posts/" + postId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("posts/detail"))
-                .andExpect(model().attributeExists("post"))
-                .andExpect(model().attributeExists("comments"));
+                .andExpect(model().attributeExists("postWithComments"));
         then(postService).should().getPost(postId);
         then(postCommentService).should().searchPostComments(postId);
     }
@@ -182,10 +175,9 @@ class PostControllerTest {
                         .content(formDataEncoder.encode(postRequest))
                         .with(csrf())
         )
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("posts/detail"))
-                .andExpect(model().attributeExists("post"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/posts/" + postId))
+                .andExpect(redirectedUrl("/posts/" + postId));
         //postService 의 updatePost 메서드가 특정 인자들로 호출되었는지 확인
         then(postService).should().updatePost(eq(postId), any(PostDto.class));
     }
@@ -244,10 +236,9 @@ class PostControllerTest {
                         .content(formDataEncoder.encode(postRequest))
                         .with(csrf())
         )
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("posts/detail"))
-                .andExpect(model().attributeExists("post"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/posts/" + createPostDto().id()))
+                .andExpect(redirectedUrl("/posts/" + createPostDto().id()));
         then(postService).should().createPost(any(PostDto.class));
     }
 
@@ -257,7 +248,7 @@ class PostControllerTest {
             createUserAccountDto(),
             "title",
             "content"
-    );
+        );
     }
 
     private UserAccountDto createUserAccountDto() {
