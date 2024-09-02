@@ -4,21 +4,45 @@
     <attr sel="#footer" th:replace="~{footer :: footer}" />
 
     <attr sel="main">
-        <attr sel="#delete-post-form"  th:if="${#authorization.expression('isAuthenticated()')} and ${post.userId} == ${#authentication.name}"
-              th:action="'/posts/' + ${post.id} + '/delete'" th:method="post">
-            <attr sel="#editPostBtn" th:href="'/posts/' + ${post.id} + '/edit'" th:method="get"/>
+        <attr sel="#delete-post-form"  th:if="${#authorization.expression('isAuthenticated()')} and ${postWithComments.userId} == ${#authentication.name}"
+              th:action="'/posts/' + ${postWithComments.id} + '/delete'" th:method="post">
+            <attr sel="#editPostBtn" th:href="'/posts/' + ${postWithComments.id} + '/edit'" th:method="get"/>
         </attr>
 
         <attr sel="#post-list">
-            <attr sel="div[0]" th:object="${post}">
-                <attr sel="div.user-id/b" th:text="${post.userId}" />
-                <attr sel="div.created-at/time" th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}" />
+            <attr sel="div[0]">
+                <attr sel="div.user-id/b" th:text="${postWithComments.nickname}" />
+                <attr sel="div.created-at/time" th:datetime="${postWithComments.createdAt}" th:text="${#temporals.format(postWithComments.createdAt, 'yyyy-MM-dd HH:mm')}" />
                 <attr sel=".post-title-content" />
-                <attr sel="b.title" th:text="${post.title}"/>
-                <attr sel="span.content" th:text="${post.content}"/>
+                <attr sel="b.title" th:text="${postWithComments.title}"/>
+                <attr sel="span.content" th:text="${postWithComments.content}"/>
             </attr>
         </attr>
-
+        <attr sel=".post-id" th:name="postId" th:value="${postWithComments.id}" />
+        <attr sel=".comment-form" th:action="@{/comments/new}" th:method="post">
+            <attr sel=".comment-textbox" th:name="content" />
+        </attr>
+        <attr sel="#post-comments">
+            <attr sel=".parent-comment[0]" th:each="comment : ${postWithComments.postCommentsResponse}">
+                <attr sel=".comment-delete-form" th:action="'/comments/' + ${comment.id} + '/delete'" th:method="post">
+                    <attr sel=".parentCommentClass/strong" th:text="${comment.nickname}" />
+                    <attr sel=".parentCommentClass/small/time" th:datetime="${comment.createdAt}" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
+                    <attr sel=".parentCommentClass/button" th:if="${#authorization.expression('isAuthenticated()')} and ${comment.userId} == ${#authentication.name}" />
+                    <attr sel=".parentCommentClass/p" th:text="${comment.content}" />
+                </attr>
+                <attr sel="ul" th:if="${!comment.childComments.isEmpty()}" th:remove="all-but-first">
+                    <attr sel=".child-comment[0]" th:each="child : ${comment.childComments}">
+                        <attr sel=".comment-delete-form" th:action="'/comments/' + ${child.id} + '/delete'" th:method="post">
+                            <attr sel=".childCommentClass/strong" th:text="${child.nickname}" />
+                            <attr sel=".childCommentClass/small/time" th:datetime="${child.createdAt}" th:text="${#temporals.format(child.createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
+                            <attr sel=".childCommentClass/button" th:if="${#authorization.expression('isAuthenticated()')} and ${child.userId} == ${#authentication.name}" />
+                            <attr sel=".childCommentClass/p" th:text="${child.content}" />
+                        </attr>
+                    </attr>
+                </attr>
+                <attr sel=".parent-comment-id" th:name="parentCommentId" th:value="${comment.id}" />
+            </attr>
+        </attr>
 
     </attr>
 </thlogic>

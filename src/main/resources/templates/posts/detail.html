@@ -21,7 +21,7 @@
 </header>
 
 <main class="container bg-dark">
-    <div class="row card p-2 mx-1 bg-light" style="height: inherit;">
+    <div class="card p-2 mx-1 bg-light">
         <form id="delete-post-form" onsubmit="return confirmPostDeleteSubmit()">
             <div class="row m-2 d-flex justify-content-end">
                 <a type="button" id="editPostBtn" class="btn btn-outline-dark btn-sm col-1 mx-1">수정</a>
@@ -52,55 +52,65 @@
                 </div>
             </div>
             <hr>
-            <ul id="post-comments" class="row">
-                <li class="parent-comment">
-                    <form class="comment-delete-form">
-                        <input type="hidden" class="post-id">
-                        <div class="row">
-                            <div>
-                                <strong>Ella2</strong>
-                                <small><time>2024-01-01</time></small>
-                                <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
-                                <p class="mb-1 initialism" >
-                                    Test Row Test Row test djfdj roiwe foi weifj.<br>
-                                    Lorem ipsum dolor sit ameasdasdafaefw doiwhd qoiwdhqwoi asdnoqiwhd qodt
-                                </p>
-                            </div>
-                        </div>
-                    </form>
+            <section>
+                <form class="row m-3 mb-4 comment-form">
+                    <input type="hidden" class="post-id">
+                    <label for="comment-textbox" hidden>댓글</label>
+                    <textarea class="form-control comment-textbox" id="comment-textbox" placeholder="댓글 쓰기.." rows="2" required></textarea>
+                    <label for="comment-submit" hidden>댓글 쓰기</label>
+                    <button class="btn btn-sm btn-primary mt-2" id="comment-submit" type="submit">쓰기</button>
+                </form>
 
-                    <ul class="row">
-                        <li class="child-comment">
-                            <form class="comment-delete-form">
-                                <input type="hidden" class="post-id">
-                                <div class="row">
-                                    <div>
-                                        <strong>Ella2</strong>
-                                        <small><time>2024-01-01</time></small>
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
-                                        <p class="mb-1 initialism" >
-                                            Test Row Test Row test djfdj roiwe foi weifj.<br>
-                                            Lorem ipsum dolor sit ameasdasdafaefw doiwhd qoiwdhqwoi asdnoqiwhd qodt
-                                        </p>
-                                    </div>
+                <ul id="post-comments" class="row">
+                    <li class="parent-comment">
+                        <form class="comment-delete-form">
+                            <input type="hidden" class="post-id">
+                            <div class="row">
+                                <div class="parentCommentClass">
+                                    <strong>Ella2</strong>
+                                    <small><time>2024-01-01</time></small>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                                    <p class="mb-1 initialism" >
+                                        Test11<br>
+                                        Test22
+                                    </p>
                                 </div>
-                            </form>
-                        </li>
-                    </ul>
+                            </div>
+                        </form>
 
-                    <div class="row">
-                        <details class="col-md-10 col-lg-9 mb-4">
-                            <summary>댓글 달기</summary>
-                            <form class="comment-form">
-                                <input type="hidden" class="post-id">
-                                <input type="hidden" class="parent-comment-id">
-                                <textarea class="form-control comment-textbox" placeholder="댓글 쓰기.." rows="2" required></textarea>
-                                <button class="form-control btn btn-primary mt-2" type="submit">쓰기</button>
-                            </form>
-                        </details>
-                    </div>
-                </li>
-            </ul>
+                        <ul class="row">
+                            <li class="child-comment my-1">
+                                <form class="comment-delete-form">
+                                    <input type="hidden" class="post-id">
+                                    <div class="row">
+                                        <div class="childCommentClass">
+                                            <strong>Ella2</strong>
+                                            <small><time>2024-01-01</time></small>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                                            <p class="mb-1 initialism" >
+                                                test<br>
+                                                test2
+                                            </p>
+                                        </div>
+                                    </div>
+                                </form>
+                            </li>
+                        </ul>
+
+                        <div class="row">
+                            <details class="col-md-10 col-lg-9 mb-4">
+                                <summary>댓글 달기</summary>
+                                <form class="comment-form row m-3 mb-4 ">
+                                    <input type="hidden" class="post-id">
+                                    <input type="hidden" class="parent-comment-id">
+                                    <textarea class="form-control comment-textbox" placeholder="댓글 쓰기.." rows="2" required></textarea>
+                                    <button class="btn btn-sm btn-primary mt-2" type="submit">쓰기</button>
+                                </form>
+                            </details>
+                        </div>
+                    </li>
+                </ul>
+            </section>
         </div>
     </div>
 </main>
