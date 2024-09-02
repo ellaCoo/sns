@@ -103,7 +103,7 @@
                     data.content.forEach(function(post) {
                         let $feedList = $('.feed-list').first().clone(); // 복제하여 변경
 
-                        $feedList.find('.user-id').html('<b>'+post.userId+'</b>');
+                        $feedList.find('.user-id').html('<b>'+post.nickname+'</b>');
                         $feedList.find('.created-at time').text(moment(post.createdAt).format('YYYY-MM-DD HH:mm'));
                         $feedList.find('.post-title-content').attr('href', '/posts/'+post.id);
                         $feedList.find('.title').text(post.title);
