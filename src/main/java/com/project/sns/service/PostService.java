@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -27,6 +28,12 @@ public class PostService {
     @Transactional(readOnly = true)
     public Page<PostDto> getPosts(Pageable pageable) {
         return postRepository.findAll(pageable).map(PostDto::fromEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostDto> getPosts(UserAccountDto userAccountDto, Pageable pageable) {
+        Page<Post> posts = postRepository.findByUserAccount_UserId(userAccountDto.userId(), pageable);
+        return posts.map(PostDto::fromEntity);
     }
 
     @Transactional(readOnly = true)
