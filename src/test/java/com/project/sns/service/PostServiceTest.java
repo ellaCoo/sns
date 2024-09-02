@@ -14,9 +14,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,19 +36,46 @@ public class PostServiceTest {
     @Mock
     private UserAccountRepository userAccountRepository;
 
-    @DisplayName("getPost - 포스트 페이지를 호출하면 페이징 처리하여 반환한다.")
+    @DisplayName("getPosts - 페이징 정보를 넘기면 페이징 처리하여 반환한다.")
     @Test
-    void givenNoParameters_whenGetPosts_thenReturnsArticlePage() {
+    void givenPageable_whenGetPosts_thenReturnsPostsList() {
         // Given
         Pageable pageable = Pageable.ofSize(20);
-        given(postRepository.findAll(pageable)).willReturn(Page.empty());
+        List<Post> posts = List.of(
+                createPost(1L),
+                createPost(2L)
+        );
+        Page<Post> postPage = new PageImpl<>(posts, pageable, posts.size());
+        given(postRepository.findAll(pageable)).willReturn(postPage);
 
         // When
-        Page<PostDto> posts = sut.getPosts(pageable);
+        Page<PostDto> actual = sut.getPosts(pageable);
 
         // Then
-        assertThat(posts).isEmpty();
+        assertThat(actual).hasSize(2);
         then(postRepository).should().findAll(pageable);
+    }
+
+    @DisplayName("getPosts - user 정보와 페이징 정보를 넘기면 user의 포스트를 페이징 처리하여 반환한다.")
+    @Test
+    void givenUserInfoAndPageable_whenGetPosts_thenReturnsPostsList() {
+        // Given
+        Pageable pageable = Pageable.ofSize(20);
+        List<Post> posts = List.of(
+                createPost(1L),
+                createPost(2L)
+        );
+        Page<Post> postPage = new PageImpl<>(posts, pageable, posts.size());
+        UserAccountDto userAccountDto = createUserAccountDto();
+
+        given(postRepository.findByUserAccount_UserId(userAccountDto.userId(), pageable)).willReturn(postPage);
+
+        // When
+        Page<PostDto> actual = sut.getPosts(userAccountDto, pageable);
+
+        // Then
+        assertThat(posts).hasSize(2);
+        then(postRepository).should().findByUserAccount_UserId(userAccountDto.userId(), pageable);
     }
 
     @DisplayName("getPost - 포스트를 조회하면, 포스트를 반환한다.")
