@@ -20,6 +20,7 @@ public interface PostCommentRepository extends
 {
     List<PostComment> findByPost_Id(Long postId);
 
+    void deleteByIdAndUserAccount_userId(Long commentId, String userId);
     @Override
     default void customize(QuerydslBindings bindings, QPostComment root) {
         bindings.excludeUnlistedProperties(true);

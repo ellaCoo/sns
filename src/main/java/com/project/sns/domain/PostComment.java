@@ -3,6 +3,7 @@ package com.project.sns.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -29,11 +30,31 @@ public class PostComment extends AuditingFields {
     @Column(updatable = false) // 부모댓글 한번 셋팅했으면 그 뒤로는 업데이트 대상에서 제외 (자신의 부모댓글이 바뀌는 경우 없음)
     private Long parentCommentId;
 
+    @OrderBy("createdAt ASC")
+    @OneToMany(mappedBy = "parentCommentId", cascade = CascadeType.ALL)
+    private Set<PostComment> childComments = new LinkedHashSet<>();
+
     @Setter
     @Column(nullable = false, length = 500)
     private String content; // 본문
 
     protected PostComment() {}
+
+    private PostComment(Post post, UserAccount userAccount, Long parentCommentId, String content) {
+        this.post = post;
+        this.userAccount = userAccount;
+        this.parentCommentId = parentCommentId;
+        this.content = content;
+    }
+
+    public static PostComment of(Post post, UserAccount userAccount, String content) {
+        return new PostComment(post, userAccount, null, content);
+    }
+
+    public void addChildComment(PostComment child) {
+        child.setParentCommentId(this.getId());
+        this.getChildComments().add(child);
+    }
 
     @Override
     public boolean equals(Object o) {

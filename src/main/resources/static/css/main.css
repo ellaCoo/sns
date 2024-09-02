@@ -7,7 +7,7 @@ body {
     overflow: hidden;
 }
 main {
-    overflow: scroll;
+    overflow-y: scroll;
     height : 75vh;
 }
 .iconBtn img{

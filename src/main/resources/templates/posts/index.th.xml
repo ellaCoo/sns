@@ -6,7 +6,7 @@
     <attr sel="main" th:object="${posts}">
         <attr sel="#post-list">
             <attr sel="li[0]" th:each="post : ${posts}">
-                <attr sel="div.user-id/b" th:text="${post.userId}" />
+                <attr sel="div.user-id/b" th:text="${post.nickname}" />
                 <attr sel="div.created-at/time" th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}" />
                 <attr sel="#postLikeBtn" th:if="${#authorization.expression('isAuthenticated()')}"/>
                 <attr sel="a.post-title-content" th:href="@{'/posts/' + ${post.id}}" />
