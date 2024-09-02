@@ -107,4 +107,24 @@ public class PostController {
 
         return "redirect:/posts/" + postDto.id();
     }
+
+    @GetMapping("/myfeed")
+    public String myPostsPage(
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            ModelMap map) {
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
+        Page<PostResponse> posts = postService.getPosts(boardPrincipal.toDto(), pageable).map(PostResponse::fromDto);
+        map.addAttribute("posts", posts);
+        return "posts/index";
+    }
+
+    @PostMapping("/myfeed")
+    @ResponseBody
+    public Page<PostResponse> myPosts(
+            @RequestParam("page") int page,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+    ) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, "createdAt");
+        return postService.getPosts(pageable).map(PostResponse::fromDto);
+    }
 }
