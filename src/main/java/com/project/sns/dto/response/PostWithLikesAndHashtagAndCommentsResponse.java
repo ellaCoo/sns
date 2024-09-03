@@ -1,37 +1,34 @@
 package com.project.sns.dto.response;
 
 import com.project.sns.dto.PostCommentDto;
-import com.project.sns.dto.PostDto;
+import com.project.sns.dto.PostWithLikesAndHashtagsAndCommentsDto;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public record PostWithCommentsResponse(
-        Long id,
-        String title,
-        String content,
-        LocalDateTime createdAt,
-        String email,
-        String nickname,
+public record PostWithLikesAndHashtagAndCommentsResponse(
+        PostResponse postResponse,
         String userId,
-        Set<PostCommentResponse> postCommentsResponse
+        boolean isLike,
+        Set<String> likeUserId,
+        Set<PostCommentResponse> postCommentResponse
 ) {
-    public static PostWithCommentsResponse of(Long id, String title, String content, LocalDateTime createdAt, String email, String nickname, String userId, Set<PostCommentResponse> postCommentsResponses) {
-        return new PostWithCommentsResponse(id, title, content, createdAt, email, nickname, userId, postCommentsResponses);
+    public static PostWithLikesAndHashtagAndCommentsResponse of(PostResponse postResponse, String userId, boolean isLike, Set<String> likeUserId, Set<PostCommentResponse> postCommentResponses ) {
+        return new PostWithLikesAndHashtagAndCommentsResponse(postResponse, userId, isLike, likeUserId, postCommentResponses);
     }
 
-    public static PostWithCommentsResponse fromDto(PostDto postDto, Set<PostCommentDto> postCommentDtos) {
-        return new PostWithCommentsResponse(
-                postDto.id(),
-                postDto.title(),
-                postDto.content(),
-                postDto.createdAt(),
-                postDto.userAccountDto().email(),
-                postDto.userAccountDto().nickname(),
-                postDto.userAccountDto().userId(),
-                organizeChildComments(postCommentDtos)
+    public static PostWithLikesAndHashtagAndCommentsResponse fromDto(PostWithLikesAndHashtagsAndCommentsDto dto, String userId) {
+        Set<String> likes = dto.likeDtos().stream().map(likeDto -> likeDto.userId()).collect(Collectors.toSet());
+        return new PostWithLikesAndHashtagAndCommentsResponse(
+                PostResponse.fromDto(dto.postDto()),
+                dto.userAccountDto().userId(),
+                null != userId && likes.contains(userId),
+                likes,
+                organizeChildComments(dto.postCommentDtos())
         );
     }
 
@@ -57,5 +54,4 @@ public record PostWithCommentsResponse(
                         )
                 ));
     }
-
 }
