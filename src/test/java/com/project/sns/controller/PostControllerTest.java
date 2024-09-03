@@ -1,16 +1,18 @@
 package com.project.sns.controller;
 
 import com.project.sns.config.TestSecurityConfig;
+import com.project.sns.domain.Like;
 import com.project.sns.domain.constant.FormStatus;
-import com.project.sns.dto.PostDto;
-import com.project.sns.dto.UserAccountDto;
+import com.project.sns.dto.*;
 import com.project.sns.dto.request.PostRequest;
 import com.project.sns.dto.response.PostResponse;
+import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
 import com.project.sns.util.FormDataEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +24,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -94,17 +97,15 @@ class PostControllerTest {
     void givenAuthorizedUser_whenRequestingPostView_thenReturnsPostView() throws Exception {
         // Given
         Long postId = 1L;
-        given(postService.getPost(postId)).willReturn(createPostDto());
-        given(postCommentService.searchPostComments(postId)).willReturn(new TreeSet<>());
+        given(postService.getPostWithLikesAndHashtagsAndComments(postId)).willReturn(createPostWithLikesAndHashtagsAndCommentDto());
 
         // When & Then
         mvc.perform(get("/posts/" + postId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("posts/detail"))
-                .andExpect(model().attributeExists("postWithComments"));
-        then(postService).should().getPost(postId);
-        then(postCommentService).should().searchPostComments(postId);
+                .andExpect(model().attributeExists("post"));
+        then(postService).should().getPostWithLikesAndHashtagsAndComments(postId);
     }
 
     @DisplayName("[view][GET] 포스트 페이지 반환 - 인증 없을 땐 로그인 페이지로 이동")
@@ -258,6 +259,52 @@ class PostControllerTest {
                 "ella@mail.com",
                 "ella",
                 "memo"
+        );
+    }
+
+    private LikeDto createLikeDto(Long id) {
+        return LikeDto.of(
+                id,
+                createPostDto().id(),
+                createUserAccountDto().userId()
+        );
+    }
+    private PostCommentDto createPostCommentDto(Long id, Long parentCommentId, LocalDateTime createdAt) {
+        return PostCommentDto.of(
+                id,
+                1L,
+                createUserAccountDto(),
+                parentCommentId,
+                "test comment :" + id,
+                createdAt,
+                "ella",
+                createdAt,
+                "ella"
+        );
+    }
+
+    private Set<PostCommentDto> createPostCommentDtos() {
+        LocalDateTime now = LocalDateTime.now();
+        Set<PostCommentDto> postCommentDtos = Set.of(
+                createPostCommentDto(1L, null, now),
+                createPostCommentDto(2L, null, now.plusDays(1L)),
+                createPostCommentDto(3L, null, now.plusDays(3L)),
+                createPostCommentDto(4L, null, now),
+                createPostCommentDto(5L, null, now.plusDays(5L)),
+                createPostCommentDto(6L, null, now.plusDays(4L)),
+                createPostCommentDto(7L, null, now.plusDays(2L)),
+                createPostCommentDto(8L, null, now.plusDays(7L))
+        );
+        return postCommentDtos;
+    }
+
+
+    private PostWithLikesAndHashtagsAndCommentsDto createPostWithLikesAndHashtagsAndCommentDto() {
+        return PostWithLikesAndHashtagsAndCommentsDto.of(
+                createPostDto(),
+                createUserAccountDto(),
+                Set.of(createLikeDto(1L)),
+                createPostCommentDtos()
         );
     }
 }

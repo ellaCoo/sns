@@ -3,6 +3,8 @@ package com.project.sns.service;
 import com.project.sns.domain.Post;
 import com.project.sns.domain.UserAccount;
 import com.project.sns.dto.PostDto;
+import com.project.sns.dto.PostWithLikesAndHashtagsAndCommentsDto;
+import com.project.sns.dto.PostWithLikesAndHashtagsDto;
 import com.project.sns.dto.UserAccountDto;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -49,7 +51,7 @@ public class PostServiceTest {
         given(postRepository.findAll(pageable)).willReturn(postPage);
 
         // When
-        Page<PostDto> actual = sut.getPosts(pageable);
+        Page<PostWithLikesAndHashtagsDto> actual = sut.getPosts(pageable);
 
         // Then
         assertThat(actual).hasSize(2);
@@ -71,10 +73,10 @@ public class PostServiceTest {
         given(postRepository.findByUserAccount_UserId(userAccountDto.userId(), pageable)).willReturn(postPage);
 
         // When
-        Page<PostDto> actual = sut.getPosts(userAccountDto, pageable);
+        Page<PostWithLikesAndHashtagsDto> actual = sut.getPosts(userAccountDto, pageable);
 
         // Then
-        assertThat(posts).hasSize(2);
+        assertThat(actual).hasSize(2);
         then(postRepository).should().findByUserAccount_UserId(userAccountDto.userId(), pageable);
     }
 
