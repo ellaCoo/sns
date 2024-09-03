@@ -6,12 +6,14 @@
     <attr sel="main" th:object="${posts}">
         <attr sel="#post-list">
             <attr sel="li[0]" th:each="post : ${posts}">
-                <attr sel="div.user-id/b" th:text="${post.nickname}" />
-                <attr sel="div.created-at/time" th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}" />
-                <attr sel="#postLikeBtn" th:if="${#authorization.expression('isAuthenticated()')}"/>
-                <attr sel="a.post-title-content" th:href="@{'/posts/' + ${post.id}}" />
-                <attr sel="b.title" th:text="${post.title}"/>
-                <attr sel="span.content" th:text="${post.content}"/>
+                <attr sel="div.user-id/b" th:text="${post.postResponse.nickname}" />
+                <attr sel="div.created-at/time" th:datetime="${post.postResponse.createdAt}" th:text="${#temporals.format(post.postResponse.createdAt, 'yyyy-MM-dd HH:mm')}" />
+                <attr sel="#postLikeBtn" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <attr sel=".postLikeImg"  th:src="${post.isLike} ? @{/images/icon-red-heart.png} : @{/images/icon-heart.png}"/>
+                </attr>
+                <attr sel="a.post-title-content" th:href="@{'/posts/' + ${post.postResponse.id}}" />
+                <attr sel="b.title" th:text="${post.postResponse.title}"/>
+                <attr sel="span.content" th:text="${post.postResponse.content}"/>
             </attr>
         </attr>
 

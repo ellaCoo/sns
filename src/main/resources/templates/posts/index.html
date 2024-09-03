@@ -31,7 +31,7 @@
                         <div class="user-id"><b>작성자</b></div>
                         <div class="created-at initialism"><time>2024-01-01</time></div>
                         <a role="button" id="postLikeBtn" class="iconSmallBtn position-absolute top-0 end-0 p-1">
-                            <img alt="like" src="/images/icon-heart.png">
+                            <img alt="like" class="postLikeImg" src="/images/icon-heart.png">
                         </a>
                     </div>
                     <div class="card card-body custom-card">
@@ -79,6 +79,9 @@
         let totalPages = [[${posts.totalPages}]];
         let totalElements = [[${posts.totalElements}]];
 
+        // console.log('currentPage: ' + currentPage);
+        // console.log('totalPages: ' + totalPages);
+
         currentPage = Number(currentPage);
 
         $('#pagination').on('click', function() {
@@ -105,6 +108,7 @@
 
                         $feedList.find('.user-id').html('<b>'+post.nickname+'</b>');
                         $feedList.find('.created-at time').text(moment(post.createdAt).format('YYYY-MM-DD HH:mm'));
+                        $feedList.find('.postLikeImg').attr('src', post.isLike ? '/images/icon-red-heart.png' : '/images/icon-heart.png');
                         $feedList.find('.post-title-content').attr('href', '/posts/'+post.id);
                         $feedList.find('.title').text(post.title);
                         $feedList.find('.content').text(post.content);
