@@ -276,13 +276,13 @@ insert into hashtag (hashtag_name, created_at, modified_at, created_by, modified
 
 
 -- post_hashtag (100)
-insert into post_hashtag (post_id, hashtag_id) values (15, 12);
+insert into post_hashtag (post_id, hashtag_id) values (49, 12);
 insert into post_hashtag (post_id, hashtag_id) values (49, 7);
-insert into post_hashtag (post_id, hashtag_id) values (2, 12);
-insert into post_hashtag (post_id, hashtag_id) values (6, 13);
-insert into post_hashtag (post_id, hashtag_id) values (40, 13);
-insert into post_hashtag (post_id, hashtag_id) values (39, 14);
-insert into post_hashtag (post_id, hashtag_id) values (6, 7);
+insert into post_hashtag (post_id, hashtag_id) values (28, 12);
+insert into post_hashtag (post_id, hashtag_id) values (28, 13);
+insert into post_hashtag (post_id, hashtag_id) values (49, 13);
+insert into post_hashtag (post_id, hashtag_id) values (28, 14);
+insert into post_hashtag (post_id, hashtag_id) values (28, 7);
 insert into post_hashtag (post_id, hashtag_id) values (48, 14);
 insert into post_hashtag (post_id, hashtag_id) values (22, 6);
 insert into post_hashtag (post_id, hashtag_id) values (41, 7);
@@ -338,7 +338,7 @@ insert into post_hashtag (post_id, hashtag_id) values (32, 15);
 insert into post_hashtag (post_id, hashtag_id) values (9, 1);
 insert into post_hashtag (post_id, hashtag_id) values (35, 8);
 insert into post_hashtag (post_id, hashtag_id) values (38, 2);
-insert into post_hashtag (post_id, hashtag_id) values (49, 12);
+insert into post_hashtag (post_id, hashtag_id) values (49, 1);
 insert into post_hashtag (post_id, hashtag_id) values (7, 2);
 insert into post_hashtag (post_id, hashtag_id) values (33, 7);
 insert into post_hashtag (post_id, hashtag_id) values (40, 15);
