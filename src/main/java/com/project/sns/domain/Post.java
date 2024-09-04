@@ -36,7 +36,7 @@ public class Post extends AuditingFields {
     private Set<Like> likes = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<PostHashtag> hashtags = new LinkedHashSet<>();
+    private Set<PostHashtag> postHashtags = new LinkedHashSet<>();
 
     protected Post() {}
 
