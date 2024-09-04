@@ -3,6 +3,8 @@ package com.project.sns.service;
 import com.project.sns.domain.Post;
 import com.project.sns.domain.UserAccount;
 import com.project.sns.dto.PostDto;
+import com.project.sns.dto.PostWithLikesAndHashtagsAndCommentsDto;
+import com.project.sns.dto.PostWithLikesAndHashtagsDto;
 import com.project.sns.dto.UserAccountDto;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -14,9 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
-
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
@@ -26,14 +25,21 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
-    public Page<PostDto> getPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).map(PostDto::fromEntity);
+    public Page<PostWithLikesAndHashtagsDto> getPosts(Pageable pageable) {
+        return postRepository.findAll(pageable).map(PostWithLikesAndHashtagsDto::fromEntity);
     }
 
     @Transactional(readOnly = true)
-    public Page<PostDto> getPosts(UserAccountDto userAccountDto, Pageable pageable) {
-        Page<Post> posts = postRepository.findByUserAccount_UserId(userAccountDto.userId(), pageable);
-        return posts.map(PostDto::fromEntity);
+    public Page<PostWithLikesAndHashtagsDto> getPosts(UserAccountDto userAccountDto, Pageable pageable) {
+        return postRepository.findByUserAccount_UserId(userAccountDto.userId(), pageable)
+                .map(PostWithLikesAndHashtagsDto::fromEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public PostWithLikesAndHashtagsAndCommentsDto getPostWithLikesAndHashtagsAndComments(Long postId) {
+        return postRepository.findById(postId)
+                .map(PostWithLikesAndHashtagsAndCommentsDto::fromEntity)
+                .orElseThrow(() -> new EntityNotFoundException("포스트가 없습니다 - postId: " + postId));
     }
 
     @Transactional(readOnly = true)

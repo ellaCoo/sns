@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.never;
 
-@DisplayName("비즈니스 로직 - 댓글")
+@DisplayName("비즈니스 로직 - PostComment")
 @ExtendWith(MockitoExtension.class) //Mockito를 사용하여 테스트를 작성할 때 필요한 확장 기능을 제공
 class PostCommentServiceTest {
     @InjectMocks

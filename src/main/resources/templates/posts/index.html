@@ -30,9 +30,15 @@
                     <div class="col-2 text-dark pt-3 position-relative">
                         <div class="user-id"><b>작성자</b></div>
                         <div class="created-at initialism"><time>2024-01-01</time></div>
-                        <a role="button" id="postLikeBtn" class="iconSmallBtn position-absolute top-0 end-0 p-1">
-                            <img alt="like" src="/images/icon-heart.png">
-                        </a>
+                        <form class="like-form">
+                            <a role="button" class="postLikeBtn iconSmallBtn position-absolute top-0 end-0 p-1">
+                                <img alt="like" class="postLikeImg" src="/images/icon-heart.png">
+                            </a>
+                        </form>
+                        <div class="initialism">
+                            <span>LIKES : </span>
+                            <b class="like-count">0</b>
+                        </div>
                     </div>
                     <div class="card card-body custom-card">
                         <a class="mb-2 post-title-content text-reset">
@@ -79,6 +85,9 @@
         let totalPages = [[${posts.totalPages}]];
         let totalElements = [[${posts.totalElements}]];
 
+        // console.log('currentPage: ' + currentPage);
+        // console.log('totalPages: ' + totalPages);
+
         currentPage = Number(currentPage);
 
         $('#pagination').on('click', function() {
@@ -103,11 +112,19 @@
                     data.content.forEach(function(post) {
                         let $feedList = $('.feed-list').first().clone(); // 복제하여 변경
 
-                        $feedList.find('.user-id').html('<b>'+post.nickname+'</b>');
-                        $feedList.find('.created-at time').text(moment(post.createdAt).format('YYYY-MM-DD HH:mm'));
-                        $feedList.find('.post-title-content').attr('href', '/posts/'+post.id);
-                        $feedList.find('.title').text(post.title);
-                        $feedList.find('.content').text(post.content);
+                        $feedList.find('.user-id').html('<b>'+post.postResponse.nickname+'</b>');
+                        $feedList.find('.created-at time').text(moment(post.postResponse.createdAt).format('YYYY-MM-DD HH:mm'));
+
+                        $feedList.find('.like-form').attr('id', 'like-'+post.postResponse.id);
+                        $feedList.find('.like-form').attr('action',
+                            post.isLike ? '/like/' + post.postResponse.id + '/delete' : '/like/' + post.postResponse.id + '/create');
+                        $feedList.find('.postLikeBtn').attr('onclick', 'document.querySelector(\'#like-'+post.postResponse.id+'\').submit();');
+                        $feedList.find('.postLikeImg').attr('src', post.isLike ? '/images/icon-red-heart.png' : '/images/icon-heart.png');
+                        $feedList.find('.like-count').text(post.likeUserId.length);
+
+                        $feedList.find('.post-title-content').attr('href', '/posts/'+post.postResponse.id);
+                        $feedList.find('.title').text(post.postResponse.title);
+                        $feedList.find('.content').text(post.postResponse.content);
                         // $feedList.find('.badge').each(function() {
                         //     $(this).find('a').text('#새태그');
                         // });

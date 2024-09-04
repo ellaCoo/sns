@@ -1,5 +1,6 @@
 package com.project.sns.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "\"like\"")
-public class Like {
+public class Like extends AuditingFields {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,4 +22,16 @@ public class Like {
     @JoinColumn(name = "userId")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private UserAccount userAccount;
+
+    protected Like() {}
+
+    private Like(Post post, UserAccount userAccount) {
+        this.post = post;
+        this.userAccount = userAccount;
+    }
+
+    public static Like of(Post post, UserAccount userAccount) {
+        return new Like(post, userAccount);
+    }
+
 }

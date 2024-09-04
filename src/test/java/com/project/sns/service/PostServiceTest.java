@@ -3,6 +3,8 @@ package com.project.sns.service;
 import com.project.sns.domain.Post;
 import com.project.sns.domain.UserAccount;
 import com.project.sns.dto.PostDto;
+import com.project.sns.dto.PostWithLikesAndHashtagsAndCommentsDto;
+import com.project.sns.dto.PostWithLikesAndHashtagsDto;
 import com.project.sns.dto.UserAccountDto;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -25,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.BDDMockito.*;
 
-@DisplayName("비즈니스 로직 - 포스트")
+@DisplayName("비즈니스 로직 - Post")
 @ExtendWith(MockitoExtension.class) //Mockito를 사용하여 테스트를 작성할 때 필요한 확장 기능을 제공
 public class PostServiceTest {
     @InjectMocks //PostService 객체를 생성하고, @Mock으로 주입된 PostRepository를 이 객체에 주입
@@ -49,7 +51,7 @@ public class PostServiceTest {
         given(postRepository.findAll(pageable)).willReturn(postPage);
 
         // When
-        Page<PostDto> actual = sut.getPosts(pageable);
+        Page<PostWithLikesAndHashtagsDto> actual = sut.getPosts(pageable);
 
         // Then
         assertThat(actual).hasSize(2);
@@ -71,10 +73,10 @@ public class PostServiceTest {
         given(postRepository.findByUserAccount_UserId(userAccountDto.userId(), pageable)).willReturn(postPage);
 
         // When
-        Page<PostDto> actual = sut.getPosts(userAccountDto, pageable);
+        Page<PostWithLikesAndHashtagsDto> actual = sut.getPosts(userAccountDto, pageable);
 
         // Then
-        assertThat(posts).hasSize(2);
+        assertThat(actual).hasSize(2);
         then(postRepository).should().findByUserAccount_UserId(userAccountDto.userId(), pageable);
     }
 

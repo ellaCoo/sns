@@ -377,5 +377,7 @@ insert into post_hashtag (post_id, hashtag_id) values (20, 4);
 insert into post_hashtag (post_id, hashtag_id) values (19, 15);
 insert into post_hashtag (post_id, hashtag_id) values (21, 13);
 
--- -- like (2)
--- insert into "like" (post_id, user_account_id, created_at, modified_at, created_by, modified_by) values (28, 'ella', '2024-08-05 02:34:15', '2024-08-06 18:42:14', 'ella', 'ella');
+-- -- like (3)
+insert into "like" (post_id, user_id, created_at, modified_at, created_by, modified_by) values (28, 'ella', '2024-08-05 02:34:15', '2024-08-06 18:42:14', 'ella', 'ella');
+insert into "like" (post_id, user_id, created_at, modified_at, created_by, modified_by) values (49, 'ella', '2024-08-05 02:34:15', '2024-08-06 18:42:14', 'ella', 'ella');
+insert into "like" (post_id, user_id, created_at, modified_at, created_by, modified_by) values (49, 'ella2', '2024-08-05 02:34:15', '2024-08-06 18:42:14', 'ella2', 'ella2');

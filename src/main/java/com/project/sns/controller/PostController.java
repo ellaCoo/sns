@@ -3,10 +3,9 @@ package com.project.sns.controller;
 import com.project.sns.domain.constant.FormStatus;
 import com.project.sns.dto.PostDto;
 import com.project.sns.dto.request.PostRequest;
-import com.project.sns.dto.PostCommentDto;
-import com.project.sns.dto.response.PostCommentResponse;
 import com.project.sns.dto.response.PostResponse;
-import com.project.sns.dto.response.PostWithCommentsResponse;
+import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
+import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
 import com.project.sns.dto.security.BoardPrincipal;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
@@ -21,8 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-
 @RequiredArgsConstructor
 @RequestMapping("/posts")
 @Controller
@@ -32,38 +29,54 @@ public class PostController {
     private final PostCommentService postCommentService;
     private final UserAccountService userAccountService;
 
+    private Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
     @GetMapping
-    public String postsPage(ModelMap map) {
-        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
-        Page<PostResponse> posts = postService.getPosts(pageable).map(PostResponse::fromDto);
-        map.addAttribute("posts", posts);
+    public String postsPage(
+            ModelMap map,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+    ) {
+        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(pageable)
+                .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
+
+        map.addAttribute("posts", response);
         return "posts/index";
     }
 
     @PostMapping
     @ResponseBody
-    public Page<PostResponse> posts(@RequestParam("page") int page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, "createdAt");
-        return postService.getPosts(pageable).map(PostResponse::fromDto);
+    public Page<PostWithLikesAndHashtagsResponse> posts(
+            @RequestParam("page") int page,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+    ) {
+        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(pageable.withPage(page))
+                .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
+        return response;
     }
 
     @GetMapping("/{postId}")
     public String postPage(
             @PathVariable Long postId,
-            ModelMap map) {
-        PostWithCommentsResponse postWithComments = PostWithCommentsResponse
-                .fromDto(postService.getPost(postId), postCommentService.searchPostComments(postId));
-        map.addAttribute("postWithComments", postWithComments);
+            ModelMap map,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+    ) {
+        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        PostWithLikesAndHashtagAndCommentsResponse response = PostWithLikesAndHashtagAndCommentsResponse
+                .fromDto(postService.getPostWithLikesAndHashtagsAndComments(postId), user);
 
+        map.addAttribute("post", response);
         return "posts/detail";
     }
 
     @GetMapping("/{postId}/edit")
     public String updatePostPage(
             @PathVariable Long postId,
-            ModelMap map) {
-        PostResponse post = PostResponse.fromDto(postService.getPost(postId));
-        map.addAttribute("post", post);
+            ModelMap map
+    ) {
+        PostResponse response = PostResponse.fromDto(postService.getPost(postId));
+
+        map.addAttribute("post", response);
         map.addAttribute("formStatus", FormStatus.UPDATE);
         return "posts/form";
     }
@@ -72,8 +85,8 @@ public class PostController {
     public String updatePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal BoardPrincipal boardPrincipal,
-            PostRequest postRequest,
-            ModelMap map) {
+            PostRequest postRequest
+    ) {
         postService.updatePost(postId, postRequest.toDto(boardPrincipal.toDto()));
 
         return "redirect:/posts/" + postId;
@@ -112,19 +125,22 @@ public class PostController {
     public String myPostsPage(
             @AuthenticationPrincipal BoardPrincipal boardPrincipal,
             ModelMap map) {
-        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
-        Page<PostResponse> posts = postService.getPosts(boardPrincipal.toDto(), pageable).map(PostResponse::fromDto);
-        map.addAttribute("posts", posts);
+        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(boardPrincipal.toDto(), pageable)
+                .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
+        map.addAttribute("posts", response);
         return "posts/index";
     }
 
     @PostMapping("/myfeed")
     @ResponseBody
-    public Page<PostResponse> myPosts(
+    public Page<PostWithLikesAndHashtagsResponse> myPosts(
             @RequestParam("page") int page,
             @AuthenticationPrincipal BoardPrincipal boardPrincipal
     ) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, "createdAt");
-        return postService.getPosts(pageable).map(PostResponse::fromDto);
+        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(boardPrincipal.toDto(), pageable.withPage(page))
+                .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
+        return response;
     }
 }

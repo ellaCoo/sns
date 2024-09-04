@@ -4,26 +4,33 @@
     <attr sel="#footer" th:replace="~{footer :: footer}" />
 
     <attr sel="main">
-        <attr sel="#delete-post-form"  th:if="${#authorization.expression('isAuthenticated()')} and ${postWithComments.userId} == ${#authentication.name}"
-              th:action="'/posts/' + ${postWithComments.id} + '/delete'" th:method="post">
-            <attr sel="#editPostBtn" th:href="'/posts/' + ${postWithComments.id} + '/edit'" th:method="get"/>
+        <attr sel="#delete-post-form"  th:if="${#authorization.expression('isAuthenticated()')} and ${post.userId} == ${#authentication.name}"
+              th:action="'/posts/' + ${post.postResponse.id} + '/delete'" th:method="post">
+            <attr sel="#editPostBtn" th:href="'/posts/' + ${post.postResponse.id} + '/edit'" th:method="get"/>
         </attr>
 
         <attr sel="#post-list">
             <attr sel="div[0]">
-                <attr sel="div.user-id/b" th:text="${postWithComments.nickname}" />
-                <attr sel="div.created-at/time" th:datetime="${postWithComments.createdAt}" th:text="${#temporals.format(postWithComments.createdAt, 'yyyy-MM-dd HH:mm')}" />
+                <attr sel="div.user-id/b" th:text="${post.postResponse.nickname}" />
+                <attr sel="div.created-at/time" th:datetime="${post.postResponse.createdAt}" th:text="${#temporals.format(post.postResponse.createdAt, 'yyyy-MM-dd HH:mm')}" />
+                <attr sel=".like-form" th:id="'like-' + ${post.postResponse.id}" th:action="${post.isLike} ? '/like/' + ${post.postResponse.id} + '/delete' : '/like/' + ${post.postResponse.id} + '/create'" th:method="post">
+                    <attr sel=".postLikeBtn" th:onclick="'document.querySelector(\'#like-'+${post.postResponse.id}+'\').submit();'"
+                          th:if="${#authorization.expression('isAuthenticated()')}">
+                        <attr sel=".postLikeImg"  th:src="${post.isLike} ? @{/images/icon-red-heart.png} : @{/images/icon-heart.png}"/>
+                    </attr>
+                </attr>
+                <attr sel=".like-count" th:text="${post.likeUserId.size()}"/>
                 <attr sel=".post-title-content" />
-                <attr sel="b.title" th:text="${postWithComments.title}"/>
-                <attr sel="span.content" th:text="${postWithComments.content}"/>
+                <attr sel="b.title" th:text="${post.postResponse.title}"/>
+                <attr sel="span.content" th:text="${post.postResponse.content}"/>
             </attr>
         </attr>
-        <attr sel=".post-id" th:name="postId" th:value="${postWithComments.id}" />
+        <attr sel=".post-id" th:name="postId" th:value="${post.postResponse.id}" />
         <attr sel=".comment-form" th:action="@{/comments/new}" th:method="post">
             <attr sel=".comment-textbox" th:name="content" />
         </attr>
         <attr sel="#post-comments">
-            <attr sel=".parent-comment[0]" th:each="comment : ${postWithComments.postCommentsResponse}">
+            <attr sel=".parent-comment[0]" th:each="comment : ${post.postCommentResponse}">
                 <attr sel=".comment-delete-form" th:action="'/comments/' + ${comment.id} + '/delete'" th:method="post">
                     <attr sel=".parentCommentClass/strong" th:text="${comment.nickname}" />
                     <attr sel=".parentCommentClass/small/time" th:datetime="${comment.createdAt}" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
