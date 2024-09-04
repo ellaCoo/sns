@@ -43,9 +43,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostDto getPost(Long postId) {
+    public PostWithLikesAndHashtagsDto getPost(Long postId) {
         return postRepository.findById(postId)
-                .map(PostDto::fromEntity)
+                .map(PostWithLikesAndHashtagsDto::fromEntity)
                 .orElseThrow(() -> new EntityNotFoundException("포스트가 없습니다 - postId: " + postId));
     }
 

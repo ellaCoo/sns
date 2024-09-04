@@ -72,9 +72,11 @@ public class PostController {
     @GetMapping("/{postId}/edit")
     public String updatePostPage(
             @PathVariable Long postId,
-            ModelMap map
+            ModelMap map,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
     ) {
-        PostResponse response = PostResponse.fromDto(postService.getPost(postId));
+        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        PostWithLikesAndHashtagsResponse response = PostWithLikesAndHashtagsResponse.fromDto(postService.getPost(postId), user);
 
         map.addAttribute("post", response);
         map.addAttribute("formStatus", FormStatus.UPDATE);
@@ -104,8 +106,9 @@ public class PostController {
 
     @GetMapping("/form")
     public String createPostPage(ModelMap map) {
-        PostResponse post = PostResponse.of("");
-        map.addAttribute("post", post);
+        PostWithLikesAndHashtagsResponse response = PostWithLikesAndHashtagsResponse.of("");
+
+        map.addAttribute("post", response);
         map.addAttribute("formStatus", FormStatus.CREATE);
         return "posts/form";
     }

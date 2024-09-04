@@ -14,6 +14,11 @@ public record PostWithLikesAndHashtagsResponse(
         Set<String> likeUserId,
         Set<String> hashtags
 ) {
+
+    public static PostWithLikesAndHashtagsResponse of(String s) {
+        return PostWithLikesAndHashtagsResponse.of(PostResponse.of(s), null, null, null, false, null, null);
+    }
+
     public static PostWithLikesAndHashtagsResponse of(PostResponse postResponse, String email, String nickname, String userId, boolean isLike, Set<String> likeUserId, Set<String> hashtags) {
         return new PostWithLikesAndHashtagsResponse(postResponse, email, nickname, userId, isLike, likeUserId, hashtags);
     }
