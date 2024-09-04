@@ -85,17 +85,17 @@ public class PostServiceTest {
     void givenPostId_whenSearchingPost_thenReturnsPost() {
         // Given
         Long postId = 1L;
-        Post post = createPost();
+        Post post = createPost(postId);
+        PostWithLikesAndHashtagsDto expectedDto = PostWithLikesAndHashtagsDto.fromEntity(post);
+
         given(postRepository.findById(postId)).willReturn(Optional.of(post));
 
         // When
-        PostDto dto = sut.getPost(postId);
+        PostWithLikesAndHashtagsDto dto = sut.getPost(postId);
 
         // Then
         // assertThat : assertj 라이브러리를 사용하여 dto 객체가 예상대로 생성되었는지 검증
-        assertThat(dto)
-                .hasFieldOrPropertyWithValue("title", post.getTitle())
-                .hasFieldOrPropertyWithValue("content", post.getContent());
+        assertThat(dto).isEqualTo(expectedDto);
         then(postRepository).should().findById(postId); //모의된 메서드 호출을 검증
     }
 
