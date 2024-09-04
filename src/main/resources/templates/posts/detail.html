@@ -35,9 +35,15 @@
                     <div class="col-2 text-dark pt-3 position-relative">
                         <div class="user-id"><b>작성자</b></div>
                         <div class="created-at initialism"><time>2024-01-01</time></div>
-                        <a role="button" id="postLikeBtn" class="iconSmallBtn position-absolute top-0 end-0 p-1">
-                            <img alt="like" class="postLikeImg" src="/images/icon-heart.png">
-                        </a>
+                        <form class="like-form">
+                            <a role="button" class="postLikeBtn iconSmallBtn position-absolute top-0 end-0 p-1">
+                                <img alt="like" class="postLikeImg" src="/images/icon-heart.png">
+                            </a>
+                        </form>
+                        <div class="initialism">
+                            <span>LIKES : </span>
+                            <b class="like-count">0</b>
+                        </div>
                     </div>
                     <div class="card card-body custom-card">
                         <div class="mb-2 post-title-content text-reset">

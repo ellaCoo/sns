@@ -22,4 +22,16 @@ public class Like extends AuditingFields {
     @JoinColumn(name = "userId")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private UserAccount userAccount;
+
+    protected Like() {}
+
+    private Like(Post post, UserAccount userAccount) {
+        this.post = post;
+        this.userAccount = userAccount;
+    }
+
+    public static Like of(Post post, UserAccount userAccount) {
+        return new Like(post, userAccount);
+    }
+
 }
