@@ -4,16 +4,17 @@
     <attr sel="#footer" th:replace="~{footer :: footer}" />
 
     <attr sel="main">
-        <attr sel="#post-form" th:action="${formStatus?.update} ? '/posts/' + ${post.id} + '/edit' : '/posts/form'" th:method="post">
-            <attr sel="#postTitle" th:field="${post.title}"/>
-            <attr sel="#postContent" th:field="${post.content}"/>
+        <attr sel="#post-form" th:action="${formStatus?.update} ? '/posts/' + ${post.postResponse.id} + '/edit' : '/posts/form'" th:method="post">
+            <attr sel="#postTitle" th:field="${post.postResponse.title}"/>
+            <attr sel="#postContent" th:field="${post.postResponse.content}"/>
+
+            <attr sel="#hashtag"  th:field="${post.hashtags}"/>
 
             <attr sel="#post-date-visible" th:if="${formStatus?.update}">
-                <attr sel="div.created-at/time" th:datetime="${post.createdAt}" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}" />
-                <attr sel="div.modified-at/time" th:datetime="${post.modifiedAt}" th:text="${#temporals.format(post.modifiedAt, 'yyyy-MM-dd HH:mm')}" />
+                <attr sel="div.created-at/time" th:datetime="${post.postResponse.createdAt}" th:text="${#temporals.format(post.postResponse.createdAt, 'yyyy-MM-dd HH:mm')}" />
+                <attr sel="div.modified-at/time" th:datetime="${post.postResponse.modifiedAt}" th:text="${#temporals.format(post.postResponse.modifiedAt, 'yyyy-MM-dd HH:mm')}" />
             </attr>
-
-            <attr sel="#exitEditPostBtn" th:href="${formStatus?.update} ? @{'/posts/' + ${post.id}} : '/posts'" />
+            <attr sel="#exitEditPostBtn" th:href="${formStatus?.update} ? @{'/posts/' + ${post.postResponse.id}} : '/posts'" />
         </attr>
     </attr>
 </thlogic>

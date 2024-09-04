@@ -15,20 +15,23 @@ public record PostWithLikesAndHashtagAndCommentsResponse(
         String userId,
         boolean isLike,
         Set<String> likeUserId,
-        Set<PostCommentResponse> postCommentResponse
+        Set<PostCommentResponse> postCommentResponse,
+        Set<String> hashtags
 ) {
-    public static PostWithLikesAndHashtagAndCommentsResponse of(PostResponse postResponse, String userId, boolean isLike, Set<String> likeUserId, Set<PostCommentResponse> postCommentResponses ) {
-        return new PostWithLikesAndHashtagAndCommentsResponse(postResponse, userId, isLike, likeUserId, postCommentResponses);
+    public static PostWithLikesAndHashtagAndCommentsResponse of(PostResponse postResponse, String userId, boolean isLike, Set<String> likeUserId, Set<PostCommentResponse> postCommentResponses, Set<String> hashtags) {
+        return new PostWithLikesAndHashtagAndCommentsResponse(postResponse, userId, isLike, likeUserId, postCommentResponses, hashtags);
     }
 
     public static PostWithLikesAndHashtagAndCommentsResponse fromDto(PostWithLikesAndHashtagsAndCommentsDto dto, String userId) {
         Set<String> likes = dto.likeDtos().stream().map(likeDto -> likeDto.userId()).collect(Collectors.toSet());
+        Set<String> hashtags = dto.hashtagDtos().stream().map(hashtagDto -> hashtagDto.hashtagName()).collect(Collectors.toSet());
         return new PostWithLikesAndHashtagAndCommentsResponse(
                 PostResponse.fromDto(dto.postDto()),
                 dto.userAccountDto().userId(),
                 null != userId && likes.contains(userId),
                 likes,
-                organizeChildComments(dto.postCommentDtos())
+                organizeChildComments(dto.postCommentDtos()),
+                hashtags
         );
     }
 

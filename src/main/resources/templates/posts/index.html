@@ -45,9 +45,10 @@
                             <b class="title">제목</b><br>
                             <span class="content">내용</span>
                         </a>
-                        <div class="d-flex">
-                            <span class="badge text-bg-secondary mx-1"><a class="text-reset">#hashtag</a></span>
-                            <span class="badge text-bg-secondary mx-1"><a class="text-reset">#test</a></span>
+                        <div class="d-flex hashtagDiv">
+                            <a class="text-reset hashtagLink">
+                                <span class="badge text-bg-secondary mx-1 hashtag"></span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -125,9 +126,16 @@
                         $feedList.find('.post-title-content').attr('href', '/posts/'+post.postResponse.id);
                         $feedList.find('.title').text(post.postResponse.title);
                         $feedList.find('.content').text(post.postResponse.content);
-                        // $feedList.find('.badge').each(function() {
-                        //     $(this).find('a').text('#새태그');
-                        // });
+
+                        let $hashtagTemplate = $feedList.find('.hashtagLink').first().clone(); // 원본을 복제하여 템플릿으로 사용
+                        $feedList.find('.hashtagDiv').empty(); // 기존 해시태그들을 비움
+
+                        post.hashtags.forEach(function (hashtag) {
+                            let $newHashtag = $hashtagTemplate.clone(); // 템플릿을 복제하여 새로운 해시태그 요소 생성
+                            $newHashtag.attr('href', '/hashtag/' + hashtag); // 링크 수정
+                            $newHashtag.find('.hashtag').text(hashtag); // 해시태그 텍스트 수정
+                            $feedList.find('.hashtagDiv').append($newHashtag); // 해시태그Div에 추가
+                        });
 
                         $('#new-container').append($feedList);
                     });

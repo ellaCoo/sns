@@ -7,6 +7,7 @@ import com.project.sns.dto.*;
 import com.project.sns.dto.request.PostRequest;
 import com.project.sns.dto.response.PostResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
+import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
 import com.project.sns.util.FormDataEncoder;
@@ -128,7 +129,7 @@ class PostControllerTest {
     void givenAuthorizedUser_whenRequestingPostUpdateView_thenReturnsPostEditView() throws Exception {
         // Given
         Long postId = 1L;
-        given(postService.getPost(postId)).willReturn(createPostDto());
+        given(postService.getPost(postId)).willReturn(createPostWithLikesAndHashtagsDto());
 
         // When & Then
         mvc.perform(get("/posts/" + postId + "/edit"))
@@ -167,7 +168,7 @@ class PostControllerTest {
          any(PostDto.class) : PostDto 타입의 아무 객체나 허용
          */
         willDoNothing().given(postService).updatePost(eq(postId), any(PostDto.class));
-        given(postService.getPost(eq(postId))).willReturn(createPostDto());
+        given(postService.getPost(eq(postId))).willReturn(any(PostWithLikesAndHashtagsDto.class));
 
         // When & Then
         mvc.perform(
@@ -216,7 +217,7 @@ class PostControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("posts/form"))
                 .andExpect(model().attributeExists("post"))
-                .andExpect(model().attribute("post", PostResponse.of("")))
+                .andExpect(model().attribute("post", PostWithLikesAndHashtagsResponse.of("")))
                 .andExpect(model().attributeExists("formStatus"))
                 .andExpect(model().attribute("formStatus", FormStatus.CREATE));
     }
@@ -298,13 +299,39 @@ class PostControllerTest {
         return postCommentDtos;
     }
 
+    private HashtagDto createHashtagDto(Long id, String hashtagName) {
+        return HashtagDto.of(
+                id,
+                hashtagName
+        );
+    }
 
+    private Set<HashtagDto> createHashtagDtos() {
+        Set<HashtagDto> hashtagDtos = Set.of(
+                createHashtagDto(1L, "1"),
+                createHashtagDto(2L, "2"),
+                createHashtagDto(3L, "3"),
+                createHashtagDto(4L, "4"),
+                createHashtagDto(5L, "5")
+        );
+        return hashtagDtos;
+    }
+
+    private PostWithLikesAndHashtagsDto createPostWithLikesAndHashtagsDto() {
+        return PostWithLikesAndHashtagsDto.of(
+                createPostDto(),
+                createUserAccountDto(),
+                Set.of(createLikeDto(1L)),
+                createHashtagDtos()
+        );
+    }
     private PostWithLikesAndHashtagsAndCommentsDto createPostWithLikesAndHashtagsAndCommentDto() {
         return PostWithLikesAndHashtagsAndCommentsDto.of(
                 createPostDto(),
                 createUserAccountDto(),
                 Set.of(createLikeDto(1L)),
-                createPostCommentDtos()
+                createPostCommentDtos(),
+                createHashtagDtos()
         );
     }
 }
