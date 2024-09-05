@@ -132,8 +132,8 @@ public class PostServiceTest {
         String hashtagName = "hashtag";
         Set<String> updatedHashtags = Set.of(hashtagName);
 
-        Post post = createPost(postId);
-        UserAccount userAccount = createUserAccount(userId);
+        Post post = createPost(postId); // "title","content"
+        UserAccount userAccount = createUserAccount(userId); // "ella"
         PostWithHashtagsDto dto = createPostWithHashtagsDto(updatedTitle, updatedContent, updatedHashtags);
         Set<Hashtag> hashtags = Set.of(Hashtag.of(hashtagName));
 
