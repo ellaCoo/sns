@@ -207,19 +207,25 @@ public class PostServiceTest {
         then(hashtagService).shouldHaveNoInteractions();
     }
 
-    @DisplayName("deletePost - 포스트의 ID를 입력하면, 포스트를 삭제한다.")
+    @DisplayName("deletePost - 포스트의 ID를 입력하면, 포스트 + 좋아요 + 댓글 + PostHAshtag를 삭제한다.")
     @Test
     void givenPostId_whenDeletingPost_thenDeletesPost() {
         // Given
         Long postId = 1L;
         String userId = "ella";
+        given(postRepository.getReferenceById(postId)).willReturn(createPost(postId));
         willDoNothing().given(postRepository).deleteByIdAndUserAccount_UserId(postId, userId);
+        willDoNothing().given(postRepository).flush();
+        willDoNothing().given(hashtagService).deleteUnusedHashtags(any());
 
         // When
         sut.deletePost(1L, userId);
 
         // Then
+        then(postRepository).should().getReferenceById(postId);
         then(postRepository).should().deleteByIdAndUserAccount_UserId(postId, userId);
+        then(postRepository).should().flush();
+        then(hashtagService).should().deleteUnusedHashtags(any());
     }
 
     @DisplayName("createPost - 포스트 정보를 입력하면, 포스트를 생성한다.")

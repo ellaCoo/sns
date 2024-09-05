@@ -85,8 +85,12 @@ public class PostService {
     }
 
     public void deletePost(Long postId, String userId) {
-        // TODO: hashtag 기능 추가 시 함께 삭제 되도록
+        Post post = postRepository.getReferenceById(postId);
+        Set<Long> originHashtagIds = post.getPostHashtags().stream().map(PostHashtag::getHashtag).map(Hashtag::getId).collect(Collectors.toSet());
+
         postRepository.deleteByIdAndUserAccount_UserId(postId, userId);
+        postRepository.flush();
+        hashtagService.deleteUnusedHashtags(originHashtagIds);
     }
 
     public PostDto createPost(PostWithHashtagsDto dto) {
