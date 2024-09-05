@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <thlogic>
     <attr sel="#footerFeedBtn" th:href="@{/}" />
-    <attr sel="#footerHashtagBtn" th:href="@{/posts/search-hashtag}" />
+    <attr sel="#footerHashtagBtn" th:href="@{/posts/hashtag}" />
     <attr sel="#footerAddBtn" th:href="@{/posts/form}" />
     <attr sel="#footerNotificationBtn" th:href="@{/posts/notification}" />
     <attr sel="#footerMyFeedBtn" th:href="@{/posts/myfeed}" />

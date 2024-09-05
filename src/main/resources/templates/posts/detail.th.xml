@@ -24,7 +24,7 @@
                 <attr sel="b.title" th:text="${post.postResponse.title}"/>
                 <attr sel="span.content" th:text="${post.postResponse.content}"/>
 
-                <attr sel="a.hashtagLink" th:href="@{'/hashtag/' + ${hashtag}}" th:each="hashtag : ${post.hashtags}">
+                <attr sel="a.hashtagLink" th:href="@{'/posts/hashtag/' + ${hashtag}}" th:each="hashtag : ${post.hashtags}">
                     <attr sel="span.hashtag" th:text="${hashtag}"/>
                 </attr>
             </attr>

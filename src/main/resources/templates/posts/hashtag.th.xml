@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<thlogic>
+    <attr sel="#header" th:replace="~{header :: header}" />
+    <attr sel="#footer" th:replace="~{footer :: footer}" />
+
+    <attr sel="main">
+        <attr sel="a.hashtagLink" th:href="@{'/posts/hashtag/' + ${hashtag}}" th:each="hashtag : ${hashtags}">
+            <attr sel="span.hashtag" th:text="${hashtag}"/>
+        </attr>
+    </attr>
+</thlogic>
