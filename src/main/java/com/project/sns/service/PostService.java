@@ -5,7 +5,6 @@ import com.project.sns.domain.Post;
 import com.project.sns.domain.PostHashtag;
 import com.project.sns.domain.UserAccount;
 import com.project.sns.dto.*;
-import com.project.sns.repository.HashtagRepository;
 import com.project.sns.repository.PostHashtagRepository;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -17,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,8 +26,8 @@ import java.util.stream.Collectors;
 public class PostService {
     private final UserAccountRepository userAccountRepository;
     private final PostRepository postRepository;
-    private final HashtagRepository hashtagRepository;
     private final PostHashtagRepository postHashtagRepository;
+    private final HashtagService hashtagService;
 
     @Transactional(readOnly = true)
     public Page<PostWithLikesAndHashtagsDto> getPosts(Pageable pageable) {
@@ -74,33 +71,16 @@ public class PostService {
              */
             Set<Long> originHashtagIds = post.getPostHashtags().stream().map(PostHashtag::getHashtag).map(Hashtag::getId).collect(Collectors.toSet());
             Set<String> newHashtags = dto.hashtagDtos().stream().map(HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet());
-            // 1. 기존의 PostHashtag를 삭제
+
             postHashtagRepository.deleteByPostId(postId);
 
-            // 2. 새로운 해시태그를 추가 및 PostHashtag 관계 설정
-            Set<Hashtag> hashtags = new HashSet<>();
-            for (String hashtagName : newHashtags) {
-                Hashtag hashtag = hashtagRepository.findByHashtagName(hashtagName)
-                        .orElseGet(() -> hashtagRepository.save(Hashtag.of(hashtagName)));
-                hashtags.add(hashtag);
-            }
-
-            // 3. 새로운 PostHashtag 생성
+            Set<Hashtag> hashtags = hashtagService.getExistedOrCreatedHashtagsByHashtagNames(newHashtags);
             post.addHashtags(hashtags); // Post와 Hashtag 관계 설정
             postRepository.flush();
 
-            // 4. 기존 해시태그 중 사용되지 않는 것들 삭제
-            deleteUnusedHashtags(originHashtagIds);
+            hashtagService.deleteUnusedHashtags(originHashtagIds);
         } catch (EntityNotFoundException e) {
             log.warn("포스트 업데이트 실패. 포스트를 수정하는데 필요한 정보를 찾을 수 없습니다.");
-        }
-    }
-
-    private void deleteUnusedHashtags(Set<Long> hashtagIds) {
-        // JPQL 쿼리 실행 전, 자동 flush
-        List<Hashtag> unusedHashtags = hashtagRepository.findUnusedHashtagsByIds(hashtagIds);
-        for (Hashtag unusedHashtag : unusedHashtags) {
-            hashtagRepository.delete(unusedHashtag);
         }
     }
 
@@ -113,23 +93,12 @@ public class PostService {
         UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
 
         Post post = dto.postDto().toEntity(userAccount);
-        /**
-         Hashtag LOGIC
-         */
-        Set<String> newHashtags = dto.hashtagDtos().stream().map(HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet());
-        // 2. 새로운 해시태그를 추가 및 PostHashtag 관계 설정
-        Set<Hashtag> hashtags = new HashSet<>();
-        for (String hashtagName : newHashtags) {
-            Hashtag hashtag = hashtagRepository.findByHashtagName(hashtagName)
-                    .orElseGet(() -> hashtagRepository.save(Hashtag.of(hashtagName)));
-            hashtags.add(hashtag);
-        }
 
-        // 3. 새로운 PostHashtag 생성
-        post.addHashtags(hashtags); // Post와 Hashtag 관계 설정
+        Set<String> newHashtags = dto.hashtagDtos().stream().map(HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet());
+        Set<Hashtag> hashtags = hashtagService.getExistedOrCreatedHashtagsByHashtagNames(newHashtags);
+        post.addHashtags(hashtags);
 
         post = postRepository.save(post);
-
         return PostDto.fromEntity(post);
     }
 }
