@@ -12,6 +12,9 @@ public record HashtagDto(
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
+    public static HashtagDto of(String hashtagName) {
+        return HashtagDto.of(null, hashtagName);
+    }
     public static HashtagDto of(Long id, String hashtagName) {
         return HashtagDto.of(id, hashtagName, null, null, null, null);
     }

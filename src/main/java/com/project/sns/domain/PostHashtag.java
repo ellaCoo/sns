@@ -22,4 +22,14 @@ public class PostHashtag {
     private Hashtag hashtag;
 
     protected PostHashtag() {}
+
+    private PostHashtag(Post post, Hashtag hashtag) {
+        this.post = post;
+        this.hashtag = hashtag;
+    }
+
+    public static PostHashtag of(Post post, Hashtag hashtag) {
+        return new PostHashtag(post, hashtag);
+    }
+
 }
