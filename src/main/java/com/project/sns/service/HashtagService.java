@@ -1,15 +1,18 @@
 package com.project.sns.service;
 
 import com.project.sns.domain.Hashtag;
+import com.project.sns.dto.HashtagDto;
 import com.project.sns.repository.HashtagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,4 +38,11 @@ public class HashtagService {
         }
         return hashtags;
     }
+
+    public List<HashtagDto> getAllHashtags() {
+        return hashtagRepository.findAllHashtagsSortedIgnoreCase()
+                .stream().map(HashtagDto::fromEntity).collect(Collectors.toList());
+    }
+
+
 }

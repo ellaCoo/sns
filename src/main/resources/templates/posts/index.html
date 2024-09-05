@@ -132,7 +132,7 @@
 
                         post.hashtags.forEach(function (hashtag) {
                             let $newHashtag = $hashtagTemplate.clone(); // 템플릿을 복제하여 새로운 해시태그 요소 생성
-                            $newHashtag.attr('href', '/hashtag/' + hashtag); // 링크 수정
+                            $newHashtag.attr('href', '/posts/hashtag/' + hashtag); // 링크 수정
                             $newHashtag.find('.hashtag').text(hashtag); // 해시태그 텍스트 수정
                             $feedList.find('.hashtagDiv').append($newHashtag); // 해시태그Div에 추가
                         });

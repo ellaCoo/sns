@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,14 @@ public class PostService {
     public Page<PostWithLikesAndHashtagsDto> getPosts(UserAccountDto userAccountDto, Pageable pageable) {
         return postRepository.findByUserAccount_UserId(userAccountDto.userId(), pageable)
                 .map(PostWithLikesAndHashtagsDto::fromEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostWithLikesAndHashtagsDto> getPostsByHashtagName(String hashtagName, Pageable pageable) {
+        Optional<Hashtag> hashtag = hashtagService.getExistedOrCreatedHashtagsByHashtagNames(Set.of(hashtagName)).stream().findFirst();
+        Page<Post> posts = postRepository.findByPostHashtags_hashtagId(hashtag.get().getId(), pageable);
+        Page<PostWithLikesAndHashtagsDto> res = posts.map(PostWithLikesAndHashtagsDto::fromEntity);
+        return res;
     }
 
     @Transactional(readOnly = true)
