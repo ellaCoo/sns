@@ -169,7 +169,6 @@ class PostControllerTest {
          any(PostDto.class) : PostDto 타입의 아무 객체나 허용
          */
         willDoNothing().given(postService).updatePost(eq(postId), any(PostWithHashtagsDto.class));
-        given(postService.getPost(eq(postId))).willReturn(any(PostWithLikesAndHashtagsDto.class));
 
         // When & Then
         mvc.perform(

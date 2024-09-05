@@ -26,9 +26,9 @@ public class HashtagService {
         }
     }
 
-    public Set<Hashtag> getExistedOrCreatedHashtagsByHashtagNames(Set<String> hashtagNAmes) {
+    public Set<Hashtag> getExistedOrCreatedHashtagsByHashtagNames(Set<String> hashtagNames) {
         Set<Hashtag> hashtags = new HashSet<>();
-        for (String hashtagName : hashtagNAmes) {
+        for (String hashtagName : hashtagNames) {
             Hashtag hashtag = hashtagRepository.findByHashtagName(hashtagName)
                     .orElseGet(() -> hashtagRepository.save(Hashtag.of(hashtagName)));
             hashtags.add(hashtag);
