@@ -1,6 +1,7 @@
 package com.project.sns.repository;
 
 import com.project.sns.domain.Hashtag;
+import com.project.sns.domain.Post;
 import com.project.sns.domain.QHashtag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +21,8 @@ public interface HashtagRepository extends
     @Query("SELECT h FROM Hashtag h WHERE h.postHashtags IS EMPTY AND h.id IN :hashtagIds")
     List<Hashtag> findUnusedHashtagsByIds(@Param("hashtagIds") Set<Long> hashtagIds);
 
-
     Optional<Hashtag> findByHashtagName(String hashtagName);
+
+    @Query("SELECT h FROM Hashtag h ORDER BY LOWER(h.hashtagName) ASC")
+    List<Hashtag> findAllHashtagsSortedIgnoreCase();
 }

@@ -23,6 +23,8 @@ public interface PostRepository extends
 
     Page<Post> findByUserAccount_UserId(String userId, Pageable pageable);
 
+    Page<Post> findByPostHashtags_hashtagId(Long hashtagId, Pageable pageable);
+
     @Override
     default void customize(QuerydslBindings bindings, QPost root) {
         bindings.excludeUnlistedProperties(true);
