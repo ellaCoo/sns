@@ -39,7 +39,7 @@ public class PostServiceTest {
     @Mock
     private UserAccountRepository userAccountRepository;
     @Mock
-    private HashtagRepository hashtagRepository;
+    private HashtagService hashtagService;
     @Mock
     private PostHashtagRepository postHashtagRepository;
 
@@ -132,14 +132,17 @@ public class PostServiceTest {
         String hashtagName = "hashtag";
         Set<String> updatedHashtags = Set.of(hashtagName);
 
-        Post post = createPost(postId);
-        UserAccount userAccount = createUserAccount(userId);
+        Post post = createPost(postId); // "title","content"
+        UserAccount userAccount = createUserAccount(userId); // "ella"
         PostWithHashtagsDto dto = createPostWithHashtagsDto(updatedTitle, updatedContent, updatedHashtags);
+        Set<Hashtag> hashtags = Set.of(Hashtag.of(hashtagName));
 
         given(postRepository.getReferenceById(postId)).willReturn(post);
         given(userAccountRepository.getReferenceById(userId)).willReturn(userAccount);
-        given(hashtagRepository.findByHashtagName(anyString())).willReturn(Optional.empty());
-        given(hashtagRepository.save(any(Hashtag.class))).willReturn(Hashtag.of(hashtagName));
+        willDoNothing().given(postHashtagRepository).deleteByPostId(postId);
+        given(hashtagService.getExistedOrCreatedHashtagsByHashtagNames(updatedHashtags)).willReturn(hashtags);
+        willDoNothing().given(postRepository).flush();
+        willDoNothing().given(hashtagService).deleteUnusedHashtags(any());
 
         // When
         sut.updatePost(postId, dto);
@@ -148,7 +151,9 @@ public class PostServiceTest {
         then(postRepository).should().getReferenceById(postId);
         then(userAccountRepository).should().getReferenceById(userId);
         then(postHashtagRepository).should().deleteByPostId(postId);
-        then(hashtagRepository).should(times(1)).findByHashtagName(anyString());  // 두 개의 해시태그가 생성됨
+        then(hashtagService).should().getExistedOrCreatedHashtagsByHashtagNames(updatedHashtags);
+        then(postRepository).should().flush();
+        then(hashtagService).should().deleteUnusedHashtags(any());
 
         // Verify that the title and content are updated
         assertThat(updatedTitle).isEqualTo(post.getTitle());
@@ -172,7 +177,7 @@ public class PostServiceTest {
         then(postRepository).should().getReferenceById(dto.postDto().id());
         then(userAccountRepository).shouldHaveNoInteractions();
         then(postHashtagRepository).shouldHaveNoInteractions();
-        then(hashtagRepository).shouldHaveNoInteractions();
+        then(hashtagService).shouldHaveNoInteractions();
     }
 
     @DisplayName("updatePost - 포스트 작성자가 아닌 사람이 수정 정보를 입력하면, 아무 것도 하지 않는다.")
@@ -199,7 +204,7 @@ public class PostServiceTest {
         then(postRepository).should().getReferenceById(postId);
         then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
         then(postHashtagRepository).shouldHaveNoInteractions();
-        then(hashtagRepository).shouldHaveNoInteractions();
+        then(hashtagService).shouldHaveNoInteractions();
     }
 
     @DisplayName("deletePost - 포스트의 ID를 입력하면, 포스트를 삭제한다.")
@@ -219,13 +224,15 @@ public class PostServiceTest {
 
     @DisplayName("createPost - 포스트 정보를 입력하면, 포스트를 생성한다.")
     @Test
-    @Disabled
     void givenPostId_whenSavingPost_thenSavesPost() {
         // Given
         PostWithHashtagsDto dto = createPostWithHashtagsDto();
         Post post = createPost();
+        String hashtagName = "hashtag";
+        Set<Hashtag> hashtags = Set.of(Hashtag.of(hashtagName));
 
         given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
+        given(hashtagService.getExistedOrCreatedHashtagsByHashtagNames(any())).willReturn(hashtags);
         given(postRepository.save(any(Post.class))).willReturn(post);
 
         // When
@@ -237,6 +244,7 @@ public class PostServiceTest {
         assertThat(result.content()).isEqualTo(post.getContent());
 
         then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
+        then(hashtagService).should().getExistedOrCreatedHashtagsByHashtagNames(any());
         then(postRepository).should().save(any(Post.class));
     }
 

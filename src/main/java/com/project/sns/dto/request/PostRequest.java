@@ -7,6 +7,7 @@ import com.project.sns.dto.PostWithHashtagsDto;
 import com.project.sns.dto.UserAccountDto;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,8 +22,11 @@ public record PostRequest(
 
     public PostWithHashtagsDto toDto(UserAccountDto userAccountDto) {
         PostDto postDto = PostDto.of(userAccountDto, title, content);
-        Set<HashtagDto> hashtagDtos = Arrays.stream(hashtag.split(","))
-                .map(tag -> HashtagDto.of(tag.trim())).collect(Collectors.toSet());
+        Set<HashtagDto> hashtagDtos = new HashSet<>();
+        if (!hashtag.isBlank()) {
+            hashtagDtos = Arrays.stream(hashtag.split(",")).map(tag -> HashtagDto.of(tag.trim())).collect(Collectors.toSet());
+        }
+
         return PostWithHashtagsDto.of(
                 postDto,
                 userAccountDto,
