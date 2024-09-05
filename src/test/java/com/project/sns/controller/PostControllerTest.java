@@ -11,6 +11,7 @@ import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
 import com.project.sns.util.FormDataEncoder;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -161,13 +162,13 @@ class PostControllerTest {
     void givenUpdatedPostInfo_whenRequesting_thenUpdatePost() throws Exception {
         // Given
         Long postId = 1L; //테스트할 id
-        PostRequest postRequest = PostRequest.of("new title", "new content");
+        PostRequest postRequest = PostRequest.of("new title", "new content", "hashtag");
         /*
          willDoNothing : updatePost 메서드 호출될 때 아무런 동작 하지 않도록
          eq(postId) : postId와 동일한 값이 전달될 때
          any(PostDto.class) : PostDto 타입의 아무 객체나 허용
          */
-        willDoNothing().given(postService).updatePost(eq(postId), any(PostDto.class));
+        willDoNothing().given(postService).updatePost(eq(postId), any(PostWithHashtagsDto.class));
         given(postService.getPost(eq(postId))).willReturn(any(PostWithLikesAndHashtagsDto.class));
 
         // When & Then
@@ -181,7 +182,7 @@ class PostControllerTest {
                 .andExpect(view().name("redirect:/posts/" + postId))
                 .andExpect(redirectedUrl("/posts/" + postId));
         //postService 의 updatePost 메서드가 특정 인자들로 호출되었는지 확인
-        then(postService).should().updatePost(eq(postId), any(PostDto.class));
+        then(postService).should().updatePost(eq(postId), any(PostWithHashtagsDto.class));
     }
 
     @WithUserDetails(value = "ellaTest", setupBefore = TestExecutionEvent.TEST_EXECUTION) // TestSecurityConfig에서 지정한 유저정보 사용 가능 | TEST_EXECUTION:테스트 직전에 셋업해라
@@ -228,8 +229,8 @@ class PostControllerTest {
     @Test
     void givenNewPostInfo_whenRequesting_thenSavesNewPost() throws Exception {
         // Given
-        PostRequest postRequest = PostRequest.of("new title", "new content");
-        given(postService.createPost(any(PostDto.class))).willReturn(createPostDto());
+        PostRequest postRequest = PostRequest.of("new title", "new content", "hashtag");
+        given(postService.createPost(any(PostWithHashtagsDto.class))).willReturn(createPostDto());
 
         // When & Then
         mvc.perform(
@@ -241,7 +242,7 @@ class PostControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/posts/" + createPostDto().id()))
                 .andExpect(redirectedUrl("/posts/" + createPostDto().id()));
-        then(postService).should().createPost(any(PostDto.class));
+        then(postService).should().createPost(any(PostWithHashtagsDto.class));
     }
 
 

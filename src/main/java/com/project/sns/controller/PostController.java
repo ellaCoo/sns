@@ -116,8 +116,7 @@ public class PostController {
     @PostMapping("/form")
     public String createPost(
             @AuthenticationPrincipal BoardPrincipal boardPrincipal,
-            PostRequest postRequest,
-            ModelMap map
+            PostRequest postRequest
     ) {
         PostDto postDto = postService.createPost(postRequest.toDto(boardPrincipal.toDto()));
 

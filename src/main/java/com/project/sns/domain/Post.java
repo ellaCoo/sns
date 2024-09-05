@@ -50,6 +50,13 @@ public class Post extends AuditingFields {
         return new Post(userAccount, title, content);
     }
 
+    // 연관 관계 편의 메서드: Hashtag 추가
+    public void addHashtag(Hashtag hashtag) {
+        PostHashtag postHashtag = PostHashtag.of(this, hashtag);
+        this.postHashtags.add(postHashtag);
+        hashtag.getPostHashtags().add(postHashtag);
+    }
+
     @Override
     public boolean equals(Object o) {
         // 객체 동등성을 비교하는 메서드, 'id' 필드 기준으로 비교

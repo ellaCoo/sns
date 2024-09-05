@@ -1,11 +1,12 @@
 package com.project.sns.service;
 
+import com.project.sns.domain.Hashtag;
 import com.project.sns.domain.Post;
+import com.project.sns.domain.PostHashtag;
 import com.project.sns.domain.UserAccount;
-import com.project.sns.dto.PostDto;
-import com.project.sns.dto.PostWithLikesAndHashtagsAndCommentsDto;
-import com.project.sns.dto.PostWithLikesAndHashtagsDto;
-import com.project.sns.dto.UserAccountDto;
+import com.project.sns.dto.*;
+import com.project.sns.repository.HashtagRepository;
+import com.project.sns.repository.PostHashtagRepository;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,6 +17,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
@@ -23,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final UserAccountRepository userAccountRepository;
     private final PostRepository postRepository;
+    private final HashtagRepository hashtagRepository;
+    private final PostHashtagRepository postHashtagRepository;
 
     @Transactional(readOnly = true)
     public Page<PostWithLikesAndHashtagsDto> getPosts(Pageable pageable) {
@@ -49,18 +57,50 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("포스트가 없습니다 - postId: " + postId));
     }
 
-    public void updatePost(Long postId, PostDto dto) {
+    public void updatePost(Long postId, PostWithHashtagsDto dto) {
         try {
             Post post = postRepository.getReferenceById(postId);
             UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
 
-            if (post.getUserAccount().equals(userAccount)) {
-                if (dto.title() != null) post.setTitle(dto.title());
-                if (dto.content() != null) post.setContent(dto.content());
+            // 로그인된 사용자와 게시글 작성자가 동일한 경우(/postId/edit : get이므로 다른 사용자도 접근 가능)
+            if (!post.getUserAccount().equals(userAccount)) {
+                return;
             }
-            // TODO: hashtag 기능 추가 시 함께 업데이트 되도록
+            if (dto.postDto().title() != null) post.setTitle(dto.postDto().title());
+            if (dto.postDto().content() != null) post.setContent(dto.postDto().content());
+
+            // Hashtag LOGIC
+            Set<String> updatedHashtags = dto.hashtagDtos().stream()
+                    .map(HashtagDto::hashtagName)
+                    .collect(Collectors.toUnmodifiableSet());
+            // 1. 기존의 PostHashtag를 삭제
+            postHashtagRepository.deleteByPostId(postId);
+
+            // 2. 기존 해시태그 중 사용되지 않는 것들 삭제
+            deleteUnusedHashtags();
+
+            // 3. 새로운 해시태그를 추가 및 PostHashtag 관계 설정
+            Set<Hashtag> hashtags = new HashSet<>();
+            for (String hashtagName : updatedHashtags) {
+                Hashtag hashtag = hashtagRepository.findByHashtagName(hashtagName)
+                        .orElseGet(() -> hashtagRepository.save(Hashtag.of(hashtagName)));
+                hashtags.add(hashtag);
+            }
+
+            // 새로운 PostHashtag 생성
+            for (Hashtag hashtag : hashtags) {
+                post.addHashtag(hashtag);  // Post와 Hashtag 관계 설정
+            }
         } catch (EntityNotFoundException e) {
             log.warn("포스트 업데이트 실패. 포스트를 수정하는데 필요한 정보를 찾을 수 없습니다.");
+        }
+    }
+
+    // 사용되지 않는 Hashtag 삭제
+    private void deleteUnusedHashtags() {
+        List<Hashtag> unusedHashtags = hashtagRepository.findUnusedHashtags();
+        for (Hashtag unusedHashtag : unusedHashtags) {
+            hashtagRepository.delete(unusedHashtag);
         }
     }
 
@@ -69,11 +109,14 @@ public class PostService {
         postRepository.deleteByIdAndUserAccount_UserId(postId, userId);
     }
 
-    public PostDto createPost(PostDto dto) {
+    public PostDto createPost(PostWithHashtagsDto dto) {
         // TODO: hashtag 기능 추가 시 함께 저장 되도록
         UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+        Set<Hashtag> hashtags = dto.hashtagDtos().stream()
+                .map(HashtagDto::toEntity)
+                .collect(Collectors.toSet());
 
-        Post post = dto.toEntity(userAccount);
+        Post post = dto.postDto().toEntity(userAccount);
         post = postRepository.save(post);
         return PostDto.fromEntity(post);
     }
