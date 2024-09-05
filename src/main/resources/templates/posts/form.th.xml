@@ -5,10 +5,10 @@
 
     <attr sel="main">
         <attr sel="#post-form" th:action="${formStatus?.update} ? '/posts/' + ${post.postResponse.id} + '/edit' : '/posts/form'" th:method="post">
-            <attr sel="#postTitle" th:field="${post.postResponse.title}"/>
-            <attr sel="#postContent" th:field="${post.postResponse.content}"/>
+            <attr sel="#title" th:name="title" th:value="${post.postResponse.title}"/>
+            <attr sel="#content" th:name="content" th:text="${post.postResponse.content}"/>
 
-            <attr sel="#hashtag"  th:field="${post.hashtags}"/>
+            <attr sel="#hashtag" th:name="hashtag" th:value="${#strings.replace(#strings.replace(post.hashtags.toString(), '[', ''), ']', '')}"/>
 
             <attr sel="#post-date-visible" th:if="${formStatus?.update}">
                 <attr sel="div.created-at/time" th:datetime="${post.postResponse.createdAt}" th:text="${#temporals.format(post.postResponse.createdAt, 'yyyy-MM-dd HH:mm')}" />
