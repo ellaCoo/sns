@@ -19,7 +19,7 @@ public class Hashtag extends AuditingFields {
     @Column(nullable = false)
     private String hashtagName;
 
-    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<PostHashtag> postHashtags = new LinkedHashSet<>();
 
     protected Hashtag() {}
