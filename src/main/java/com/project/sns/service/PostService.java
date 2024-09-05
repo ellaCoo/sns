@@ -73,13 +73,13 @@ public class PostService {
              Hashtag LOGIC
              */
             Set<Long> originHashtagIds = post.getPostHashtags().stream().map(PostHashtag::getHashtag).map(Hashtag::getId).collect(Collectors.toSet());
-            Set<String> updatedHashtags = dto.hashtagDtos().stream().map(HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet());
+            Set<String> newHashtags = dto.hashtagDtos().stream().map(HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet());
             // 1. 기존의 PostHashtag를 삭제
             postHashtagRepository.deleteByPostId(postId);
 
             // 2. 새로운 해시태그를 추가 및 PostHashtag 관계 설정
             Set<Hashtag> hashtags = new HashSet<>();
-            for (String hashtagName : updatedHashtags) {
+            for (String hashtagName : newHashtags) {
                 Hashtag hashtag = hashtagRepository.findByHashtagName(hashtagName)
                         .orElseGet(() -> hashtagRepository.save(Hashtag.of(hashtagName)));
                 hashtags.add(hashtag);
@@ -110,14 +110,26 @@ public class PostService {
     }
 
     public PostDto createPost(PostWithHashtagsDto dto) {
-        // TODO: hashtag 기능 추가 시 함께 저장 되도록
         UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
-        Set<Hashtag> hashtags = dto.hashtagDtos().stream()
-                .map(HashtagDto::toEntity)
-                .collect(Collectors.toSet());
 
         Post post = dto.postDto().toEntity(userAccount);
+        /**
+         Hashtag LOGIC
+         */
+        Set<String> newHashtags = dto.hashtagDtos().stream().map(HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet());
+        // 2. 새로운 해시태그를 추가 및 PostHashtag 관계 설정
+        Set<Hashtag> hashtags = new HashSet<>();
+        for (String hashtagName : newHashtags) {
+            Hashtag hashtag = hashtagRepository.findByHashtagName(hashtagName)
+                    .orElseGet(() -> hashtagRepository.save(Hashtag.of(hashtagName)));
+            hashtags.add(hashtag);
+        }
+
+        // 3. 새로운 PostHashtag 생성
+        post.addHashtags(hashtags); // Post와 Hashtag 관계 설정
+
         post = postRepository.save(post);
+
         return PostDto.fromEntity(post);
     }
 }

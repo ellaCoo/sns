@@ -8,7 +8,7 @@
             <attr sel="#title" th:name="title" th:value="${post.postResponse.title}"/>
             <attr sel="#content" th:name="content" th:text="${post.postResponse.content}"/>
 
-            <attr sel="#hashtag" th:name="hashtag" th:value="${#strings.replace(#strings.replace(post.hashtags.toString(), '[', ''), ']', '')}"/>
+            <attr sel="#hashtag" th:name="hashtag" th:value="${formStatus?.update} ? ${#strings.replace(#strings.replace(post.hashtags.toString(), '[', ''), ']', '')} : ''"/>
 
             <attr sel="#post-date-visible" th:if="${formStatus?.update}">
                 <attr sel="div.created-at/time" th:datetime="${post.postResponse.createdAt}" th:text="${#temporals.format(post.postResponse.createdAt, 'yyyy-MM-dd HH:mm')}" />
