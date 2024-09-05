@@ -69,17 +69,20 @@ public class PostService {
             if (dto.postDto().title() != null) post.setTitle(dto.postDto().title());
             if (dto.postDto().content() != null) post.setContent(dto.postDto().content());
 
-            // Hashtag LOGIC
+            /**
+             Hashtag LOGIC
+             */
+            Set<Long> originHashtagIds = post.getPostHashtags().stream()
+                    .map(PostHashtag::getHashtag)
+                    .map(Hashtag::getId)
+                    .collect(Collectors.toSet());
             Set<String> updatedHashtags = dto.hashtagDtos().stream()
                     .map(HashtagDto::hashtagName)
                     .collect(Collectors.toUnmodifiableSet());
             // 1. 기존의 PostHashtag를 삭제
             postHashtagRepository.deleteByPostId(postId);
 
-            // 2. 기존 해시태그 중 사용되지 않는 것들 삭제
-            deleteUnusedHashtags();
-
-            // 3. 새로운 해시태그를 추가 및 PostHashtag 관계 설정
+            // 2. 새로운 해시태그를 추가 및 PostHashtag 관계 설정
             Set<Hashtag> hashtags = new HashSet<>();
             for (String hashtagName : updatedHashtags) {
                 Hashtag hashtag = hashtagRepository.findByHashtagName(hashtagName)
@@ -87,18 +90,21 @@ public class PostService {
                 hashtags.add(hashtag);
             }
 
-            // 새로운 PostHashtag 생성
+            // 3. 새로운 PostHashtag 생성
             for (Hashtag hashtag : hashtags) {
                 post.addHashtag(hashtag);  // Post와 Hashtag 관계 설정
             }
+
+            // 4. 기존 해시태그 중 사용되지 않는 것들 삭제
+            deleteUnusedHashtags(originHashtagIds);
         } catch (EntityNotFoundException e) {
             log.warn("포스트 업데이트 실패. 포스트를 수정하는데 필요한 정보를 찾을 수 없습니다.");
         }
     }
 
-    // 사용되지 않는 Hashtag 삭제
-    private void deleteUnusedHashtags() {
-        List<Hashtag> unusedHashtags = hashtagRepository.findUnusedHashtags();
+    private void deleteUnusedHashtags(Set<Long> hashtagIds) {
+        // JPQL 쿼리 실행 전, 자동 flush
+        List<Hashtag> unusedHashtags = hashtagRepository.findUnusedHashtagsByIds(hashtagIds);
         for (Hashtag unusedHashtag : unusedHashtags) {
             hashtagRepository.delete(unusedHashtag);
         }
