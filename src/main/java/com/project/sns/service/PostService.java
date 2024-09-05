@@ -72,13 +72,8 @@ public class PostService {
             /**
              Hashtag LOGIC
              */
-            Set<Long> originHashtagIds = post.getPostHashtags().stream()
-                    .map(PostHashtag::getHashtag)
-                    .map(Hashtag::getId)
-                    .collect(Collectors.toSet());
-            Set<String> updatedHashtags = dto.hashtagDtos().stream()
-                    .map(HashtagDto::hashtagName)
-                    .collect(Collectors.toUnmodifiableSet());
+            Set<Long> originHashtagIds = post.getPostHashtags().stream().map(PostHashtag::getHashtag).map(Hashtag::getId).collect(Collectors.toSet());
+            Set<String> updatedHashtags = dto.hashtagDtos().stream().map(HashtagDto::hashtagName).collect(Collectors.toUnmodifiableSet());
             // 1. 기존의 PostHashtag를 삭제
             postHashtagRepository.deleteByPostId(postId);
 
@@ -91,9 +86,8 @@ public class PostService {
             }
 
             // 3. 새로운 PostHashtag 생성
-            for (Hashtag hashtag : hashtags) {
-                post.addHashtag(hashtag);  // Post와 Hashtag 관계 설정
-            }
+            post.addHashtags(hashtags); // Post와 Hashtag 관계 설정
+            postRepository.flush();
 
             // 4. 기존 해시태그 중 사용되지 않는 것들 삭제
             deleteUnusedHashtags(originHashtagIds);
