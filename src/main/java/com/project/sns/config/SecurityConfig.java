@@ -34,7 +34,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/",
-                                "/posts"
+                                "/posts",
+                                "/posts/hashtag"
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
