@@ -10,10 +10,11 @@ public record PostWithLikesAndHashtagsAndCommentsDto(
         PostDto postDto,
         UserAccountDto userAccountDto,
         Set<LikeDto> likeDtos,
-        Set<PostCommentDto> postCommentDtos
+        Set<PostCommentDto> postCommentDtos,
+        Set<HashtagDto> hashtagDtos
 ) {
-    public static PostWithLikesAndHashtagsAndCommentsDto of(PostDto postDto, UserAccountDto userAccountDto, Set<LikeDto> likeDtos, Set<PostCommentDto> postCommentDtos) {
-        return new PostWithLikesAndHashtagsAndCommentsDto(postDto, userAccountDto, likeDtos, postCommentDtos);
+    public static PostWithLikesAndHashtagsAndCommentsDto of(PostDto postDto, UserAccountDto userAccountDto, Set<LikeDto> likeDtos, Set<PostCommentDto> postCommentDtos, Set<HashtagDto> hashtagDtos) {
+        return new PostWithLikesAndHashtagsAndCommentsDto(postDto, userAccountDto, likeDtos, postCommentDtos, hashtagDtos);
     }
 
     public static PostWithLikesAndHashtagsAndCommentsDto fromEntity(Post entity) {
@@ -27,6 +28,11 @@ public record PostWithLikesAndHashtagsAndCommentsDto(
                 entity.getPostComments().stream()
                         .map(PostCommentDto::fromEntity)
                         .collect(Collectors.toCollection(LinkedHashSet::new))
+                ,
+                entity.getPostHashtags().stream()
+                        .map(postHashtag -> postHashtag.getHashtag())
+                        .map(HashtagDto::fromEntity)
+                        .collect(Collectors.toSet())
         );
     }
 }

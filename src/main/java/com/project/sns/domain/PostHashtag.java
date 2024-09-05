@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Entity
 public class PostHashtag {
@@ -22,4 +24,25 @@ public class PostHashtag {
     private Hashtag hashtag;
 
     protected PostHashtag() {}
+
+    private PostHashtag(Post post, Hashtag hashtag) {
+        this.post = post;
+        this.hashtag = hashtag;
+    }
+
+    public static PostHashtag of(Post post, Hashtag hashtag) {
+        return new PostHashtag(post, hashtag);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PostHashtag that)) return false;
+        return this.getId() != null && this.getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId());
+    }
 }

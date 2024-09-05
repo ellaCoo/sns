@@ -23,6 +23,10 @@
                 <attr sel=".post-title-content" />
                 <attr sel="b.title" th:text="${post.postResponse.title}"/>
                 <attr sel="span.content" th:text="${post.postResponse.content}"/>
+
+                <attr sel="a.hashtagLink" th:href="@{'/posts/hashtag/' + ${hashtag}}" th:each="hashtag : ${post.hashtags}">
+                    <attr sel="span.hashtag" th:text="${hashtag}"/>
+                </attr>
             </attr>
         </attr>
         <attr sel=".post-id" th:name="postId" th:value="${post.postResponse.id}" />

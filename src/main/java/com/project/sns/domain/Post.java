@@ -36,7 +36,7 @@ public class Post extends AuditingFields {
     private Set<Like> likes = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<PostHashtag> hashtags = new LinkedHashSet<>();
+    private Set<PostHashtag> postHashtags = new LinkedHashSet<>();
 
     protected Post() {}
 
@@ -48,6 +48,15 @@ public class Post extends AuditingFields {
 
     public static Post of(UserAccount userAccount, String title, String content) {
         return new Post(userAccount, title, content);
+    }
+
+    // 연관 관계 편의 메서드: Hashtag 추가
+    public void addHashtags(Set<Hashtag> hashtags) {
+        for (Hashtag hashtag : hashtags) {
+            PostHashtag postHashtag = PostHashtag.of(this, hashtag);
+            this.postHashtags.add(postHashtag);
+            hashtag.getPostHashtags().add(postHashtag);
+        }
     }
 
     @Override

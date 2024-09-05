@@ -18,6 +18,10 @@
                 <attr sel="a.post-title-content" th:href="@{'/posts/' + ${post.postResponse.id}}" />
                 <attr sel="b.title" th:text="${post.postResponse.title}"/>
                 <attr sel="span.content" th:text="${post.postResponse.content}"/>
+
+                <attr sel="a.hashtagLink" th:href="@{'/posts/hashtag/' + ${hashtag}}" th:each="hashtag : ${post.hashtags}">
+                    <attr sel="span.hashtag" th:text="${hashtag}"/>
+                </attr>
             </attr>
         </attr>
 
@@ -25,8 +29,6 @@
             <attr sel="li[0]/a"
                   th:text="'More'"
             />
-<!--            th:class="'page-link' + (${posts.number} >= ${posts.totalPages - 1} ? ' disabled' : '')"-->
-<!--            th:href="@{/posts(page=${posts.number + 1})}"-->
         </attr>
     </attr>
 </thlogic>

@@ -7,9 +7,11 @@ import com.project.sns.dto.*;
 import com.project.sns.dto.request.PostRequest;
 import com.project.sns.dto.response.PostResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
+import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
 import com.project.sns.util.FormDataEncoder;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -128,7 +130,7 @@ class PostControllerTest {
     void givenAuthorizedUser_whenRequestingPostUpdateView_thenReturnsPostEditView() throws Exception {
         // Given
         Long postId = 1L;
-        given(postService.getPost(postId)).willReturn(createPostDto());
+        given(postService.getPost(postId)).willReturn(createPostWithLikesAndHashtagsDto());
 
         // When & Then
         mvc.perform(get("/posts/" + postId + "/edit"))
@@ -160,14 +162,13 @@ class PostControllerTest {
     void givenUpdatedPostInfo_whenRequesting_thenUpdatePost() throws Exception {
         // Given
         Long postId = 1L; //테스트할 id
-        PostRequest postRequest = PostRequest.of("new title", "new content");
+        PostRequest postRequest = PostRequest.of("new title", "new content", "hashtag");
         /*
          willDoNothing : updatePost 메서드 호출될 때 아무런 동작 하지 않도록
          eq(postId) : postId와 동일한 값이 전달될 때
          any(PostDto.class) : PostDto 타입의 아무 객체나 허용
          */
-        willDoNothing().given(postService).updatePost(eq(postId), any(PostDto.class));
-        given(postService.getPost(eq(postId))).willReturn(createPostDto());
+        willDoNothing().given(postService).updatePost(eq(postId), any(PostWithHashtagsDto.class));
 
         // When & Then
         mvc.perform(
@@ -180,7 +181,7 @@ class PostControllerTest {
                 .andExpect(view().name("redirect:/posts/" + postId))
                 .andExpect(redirectedUrl("/posts/" + postId));
         //postService 의 updatePost 메서드가 특정 인자들로 호출되었는지 확인
-        then(postService).should().updatePost(eq(postId), any(PostDto.class));
+        then(postService).should().updatePost(eq(postId), any(PostWithHashtagsDto.class));
     }
 
     @WithUserDetails(value = "ellaTest", setupBefore = TestExecutionEvent.TEST_EXECUTION) // TestSecurityConfig에서 지정한 유저정보 사용 가능 | TEST_EXECUTION:테스트 직전에 셋업해라
@@ -216,7 +217,7 @@ class PostControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("posts/form"))
                 .andExpect(model().attributeExists("post"))
-                .andExpect(model().attribute("post", PostResponse.of("")))
+                .andExpect(model().attribute("post", PostWithLikesAndHashtagsResponse.of("")))
                 .andExpect(model().attributeExists("formStatus"))
                 .andExpect(model().attribute("formStatus", FormStatus.CREATE));
     }
@@ -227,8 +228,8 @@ class PostControllerTest {
     @Test
     void givenNewPostInfo_whenRequesting_thenSavesNewPost() throws Exception {
         // Given
-        PostRequest postRequest = PostRequest.of("new title", "new content");
-        given(postService.createPost(any(PostDto.class))).willReturn(createPostDto());
+        PostRequest postRequest = PostRequest.of("new title", "new content", "hashtag");
+        given(postService.createPost(any(PostWithHashtagsDto.class))).willReturn(createPostDto());
 
         // When & Then
         mvc.perform(
@@ -240,7 +241,7 @@ class PostControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/posts/" + createPostDto().id()))
                 .andExpect(redirectedUrl("/posts/" + createPostDto().id()));
-        then(postService).should().createPost(any(PostDto.class));
+        then(postService).should().createPost(any(PostWithHashtagsDto.class));
     }
 
 
@@ -298,13 +299,39 @@ class PostControllerTest {
         return postCommentDtos;
     }
 
+    private HashtagDto createHashtagDto(Long id, String hashtagName) {
+        return HashtagDto.of(
+                id,
+                hashtagName
+        );
+    }
 
+    private Set<HashtagDto> createHashtagDtos() {
+        Set<HashtagDto> hashtagDtos = Set.of(
+                createHashtagDto(1L, "1"),
+                createHashtagDto(2L, "2"),
+                createHashtagDto(3L, "3"),
+                createHashtagDto(4L, "4"),
+                createHashtagDto(5L, "5")
+        );
+        return hashtagDtos;
+    }
+
+    private PostWithLikesAndHashtagsDto createPostWithLikesAndHashtagsDto() {
+        return PostWithLikesAndHashtagsDto.of(
+                createPostDto(),
+                createUserAccountDto(),
+                Set.of(createLikeDto(1L)),
+                createHashtagDtos()
+        );
+    }
     private PostWithLikesAndHashtagsAndCommentsDto createPostWithLikesAndHashtagsAndCommentDto() {
         return PostWithLikesAndHashtagsAndCommentsDto.of(
                 createPostDto(),
                 createUserAccountDto(),
                 Set.of(createLikeDto(1L)),
-                createPostCommentDtos()
+                createPostCommentDtos(),
+                createHashtagDtos()
         );
     }
 }
