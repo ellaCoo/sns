@@ -51,10 +51,12 @@ public class Post extends AuditingFields {
     }
 
     // 연관 관계 편의 메서드: Hashtag 추가
-    public void addHashtag(Hashtag hashtag) {
-        PostHashtag postHashtag = PostHashtag.of(this, hashtag);
-        this.postHashtags.add(postHashtag);
-        hashtag.getPostHashtags().add(postHashtag);
+    public void addHashtags(Set<Hashtag> hashtags) {
+        for (Hashtag hashtag : hashtags) {
+            PostHashtag postHashtag = PostHashtag.of(this, hashtag);
+            this.postHashtags.add(postHashtag);
+            hashtag.getPostHashtags().add(postHashtag);
+        }
     }
 
     @Override
