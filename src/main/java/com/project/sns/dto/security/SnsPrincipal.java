@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record BoardPrincipal(
+public record SnsPrincipal(
         String username,
         String password,
         Collection<? extends GrantedAuthority> authorities,
@@ -21,13 +21,13 @@ public record BoardPrincipal(
         String memo,
         Map<String, Object> oAuth2Attributes
 ) implements UserDetails, OAuth2User {
-    public static BoardPrincipal of(String username, String password, String email, String nickname, String memo) {
-        return BoardPrincipal.of(username, password, email, nickname, memo, Map.of());
+    public static SnsPrincipal of(String username, String password, String email, String nickname, String memo) {
+        return SnsPrincipal.of(username, password, email, nickname, memo, Map.of());
     }
-    public static BoardPrincipal of(String username, String password, String email, String nickname, String memo, Map<String, Object> oAuth2Attributes) {
+    public static SnsPrincipal of(String username, String password, String email, String nickname, String memo, Map<String, Object> oAuth2Attributes) {
         Set<RoleType> roleTypes = Set.of(RoleType.USER);
 
-        return new BoardPrincipal(
+        return new SnsPrincipal(
                 username,
                 password,
                 roleTypes.stream()
@@ -42,8 +42,8 @@ public record BoardPrincipal(
         );
     }
 
-    public static BoardPrincipal fromDto(UserAccountDto dto) {
-        return BoardPrincipal.of(
+    public static SnsPrincipal fromDto(UserAccountDto dto) {
+        return SnsPrincipal.of(
                 dto.userId(),
                 dto.userPassword(),
                 dto.email(),

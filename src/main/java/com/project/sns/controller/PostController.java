@@ -7,7 +7,7 @@ import com.project.sns.dto.request.PostRequest;
 import com.project.sns.dto.response.PostResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
-import com.project.sns.dto.security.BoardPrincipal;
+import com.project.sns.dto.security.SnsPrincipal;
 import com.project.sns.service.HashtagService;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
@@ -37,9 +37,9 @@ public class PostController {
     @GetMapping
     public String postsPage(
             ModelMap map,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal
     ) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
         Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(pageable)
                 .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
 
@@ -51,9 +51,9 @@ public class PostController {
     @ResponseBody
     public Page<PostWithLikesAndHashtagsResponse> posts(
             @RequestParam("page") int page,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal
     ) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
         Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(pageable.withPage(page))
                 .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
         return response;
@@ -63,9 +63,9 @@ public class PostController {
     public String postPage(
             @PathVariable Long postId,
             ModelMap map,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal
     ) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
         PostWithLikesAndHashtagAndCommentsResponse response = PostWithLikesAndHashtagAndCommentsResponse
                 .fromDto(postService.getPostWithLikesAndHashtagsAndComments(postId), user);
 
@@ -77,9 +77,9 @@ public class PostController {
     public String updatePostPage(
             @PathVariable Long postId,
             ModelMap map,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal
     ) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
         PostWithLikesAndHashtagsResponse response = PostWithLikesAndHashtagsResponse.fromDto(postService.getPost(postId), user);
 
         map.addAttribute("post", response);
@@ -90,10 +90,10 @@ public class PostController {
     @PostMapping("/{postId}/edit")
     public String updatePost(
             @PathVariable Long postId,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal,
             PostRequest postRequest
     ) {
-        postService.updatePost(postId, postRequest.toDto(boardPrincipal.toDto()));
+        postService.updatePost(postId, postRequest.toDto(snsPrincipal.toDto()));
 
         return "redirect:/posts/" + postId;
     }
@@ -101,9 +101,9 @@ public class PostController {
     @PostMapping("/{postId}/delete")
     public String deletePost(
             @PathVariable Long postId,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal
     ) {
-        postService.deletePost(postId, boardPrincipal.getUsername());
+        postService.deletePost(postId, snsPrincipal.getUsername());
 
         return "redirect:/posts";
     }
@@ -119,20 +119,20 @@ public class PostController {
 
     @PostMapping("/form")
     public String createPost(
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal,
             PostRequest postRequest
     ) {
-        PostDto postDto = postService.createPost(postRequest.toDto(boardPrincipal.toDto()));
+        PostDto postDto = postService.createPost(postRequest.toDto(snsPrincipal.toDto()));
 
         return "redirect:/posts/" + postDto.id();
     }
 
     @GetMapping("/myfeed")
     public String myPostsPage(
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal,
             ModelMap map) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
-        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(boardPrincipal.toDto(), pageable)
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
+        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(snsPrincipal.toDto(), pageable)
                 .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
         map.addAttribute("posts", response);
         return "posts/index";
@@ -142,10 +142,10 @@ public class PostController {
     @ResponseBody
     public Page<PostWithLikesAndHashtagsResponse> myPosts(
             @RequestParam("page") int page,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal
     ) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
-        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(boardPrincipal.toDto(), pageable.withPage(page))
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
+        Page<PostWithLikesAndHashtagsResponse> response = postService.getPosts(snsPrincipal.toDto(), pageable.withPage(page))
                 .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
         return response;
     }
@@ -162,11 +162,11 @@ public class PostController {
 
     @GetMapping("/hashtag/{hashtagName}")
     public String postsByHashtagPage(
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal,
             @PathVariable String hashtagName,
             ModelMap map
     ) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
         Page<PostWithLikesAndHashtagsResponse> response = postService.getPostsByHashtagName(hashtagName, pageable)
                 .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
 
@@ -179,9 +179,9 @@ public class PostController {
     public Page<PostWithLikesAndHashtagsResponse> postsByHashtag(
             @RequestParam("page") int page,
             @PathVariable String hashtagName,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal
     ) {
-        String user = null == boardPrincipal ? null : boardPrincipal.getUsername();
+        String user = null == snsPrincipal ? null : snsPrincipal.getUsername();
         Page<PostWithLikesAndHashtagsResponse> response = postService.getPostsByHashtagName(hashtagName, pageable.withPage(page))
                 .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
         return response;

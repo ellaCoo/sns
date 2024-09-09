@@ -1,6 +1,6 @@
 package com.project.sns.config;
 
-import com.project.sns.dto.security.BoardPrincipal;
+import com.project.sns.dto.security.SnsPrincipal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -20,7 +20,7 @@ public class JpaConfig {
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getPrincipal)
-                .map(BoardPrincipal.class::cast) // .map(x -> (BoardPrincipal)x)
-                .map(BoardPrincipal::getUsername);
+                .map(SnsPrincipal.class::cast) // .map(x -> (SnsPrincipal)x)
+                .map(SnsPrincipal::getUsername);
     }
 }
