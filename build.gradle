@@ -41,7 +41,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     implementation 'org.springframework.data:spring-data-rest-hal-explorer'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // kakao auth
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0'
     implementation 'org.springframework.boot:spring-boot-starter-security' //spring security
