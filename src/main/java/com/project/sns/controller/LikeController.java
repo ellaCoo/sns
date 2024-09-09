@@ -1,7 +1,7 @@
 package com.project.sns.controller;
 
 import com.project.sns.dto.LikeDto;
-import com.project.sns.dto.security.BoardPrincipal;
+import com.project.sns.dto.security.SnsPrincipal;
 import com.project.sns.service.LikeService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,11 @@ public class LikeController {
     @PostMapping("/{postId}/create")
     public String createLike(
             @PathVariable Long postId,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal,
             HttpServletRequest request
     ) throws URISyntaxException {
         String path = new URI(request.getHeader("Referer")).getPath();
-        likeService.createLike(LikeDto.of(postId, boardPrincipal.getUsername()));
+        likeService.createLike(LikeDto.of(postId, snsPrincipal.getUsername()));
 
         return "redirect:" + path;
     }
@@ -35,11 +35,11 @@ public class LikeController {
     @PostMapping("/{postId}/delete")
     public String deleteLike(
             @PathVariable Long postId,
-            @AuthenticationPrincipal BoardPrincipal boardPrincipal,
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal,
             HttpServletRequest request
     ) throws URISyntaxException {
         String path = new URI(request.getHeader("Referer")).getPath();
-        likeService.deleteLike(LikeDto.of(postId, boardPrincipal.getUsername()));
+        likeService.deleteLike(LikeDto.of(postId, snsPrincipal.getUsername()));
         return "redirect:" + path;
     }
 }
