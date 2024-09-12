@@ -1,6 +1,7 @@
 package com.project.sns.controller;
 
 import com.project.sns.config.TestSecurityConfig;
+import com.project.sns.domain.Hashtag;
 import com.project.sns.domain.Like;
 import com.project.sns.domain.constant.FormStatus;
 import com.project.sns.dto.*;
@@ -8,6 +9,7 @@ import com.project.sns.dto.request.PostRequest;
 import com.project.sns.dto.response.PostResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
+import com.project.sns.service.HashtagService;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
 import com.project.sns.util.FormDataEncoder;
@@ -49,6 +51,8 @@ class PostControllerTest {
     private PostService postService;
     @MockBean
     private PostCommentService postCommentService;
+    @MockBean
+    private HashtagService hashtagService;
 
     // 생성자주입
     PostControllerTest(
