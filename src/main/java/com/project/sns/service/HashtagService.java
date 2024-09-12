@@ -22,7 +22,6 @@ public class HashtagService {
     private final HashtagRepository hashtagRepository;
 
     public void deleteUnusedHashtags(Set<Long> hashtagIds) {
-        // JPQL 쿼리 실행 전, 자동 flush
         List<Hashtag> unusedHashtags = hashtagRepository.findUnusedHashtagsByIds(hashtagIds);
         for (Hashtag unusedHashtag : unusedHashtags) {
             hashtagRepository.delete(unusedHashtag);
