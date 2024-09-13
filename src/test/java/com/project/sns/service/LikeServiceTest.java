@@ -42,7 +42,7 @@ public class LikeServiceTest {
 
     @DisplayName("deleteLike - postId, userId 전달 받아서, 좋아요와 알림을 삭제한다.")
     @Test
-    void givenPostIdAndUserId_whenDeletingLikeAndNotification_thenDeleteLikeAndNotification() {
+    void givenPostIdAndUserId_whenDeletingLike_thenDeleteLikeAndNotification() {
         // Given
         Long postId = 1L;
         String userId = "ella";
@@ -86,7 +86,7 @@ public class LikeServiceTest {
 
     @DisplayName("createLike - postId, userId 전달 받아서, 좋아요와 알림을 저장한다.")
     @Test
-    void givenPostIdAndUserId_whenCreatingLikeAndNotification_thenCreateLikeAndNotification() {
+    void givenPostIdAndUserId_whenCreatingLike_thenCreateLikeAndNotification() {
         // Given
         Long postId = 1L;
         String userId = "ella";

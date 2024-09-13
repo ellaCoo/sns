@@ -12,6 +12,7 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostCommentRepository extends
         JpaRepository<PostComment, Long>,
@@ -20,7 +21,8 @@ public interface PostCommentRepository extends
 {
     List<PostComment> findByPost_Id(Long postId);
 
-    void deleteByIdAndUserAccount_userId(Long commentId, String userId);
+    Optional<PostComment> findByIdAndUserAccount_userId(Long commentId, String userId);
+
     @Override
     default void customize(QuerydslBindings bindings, QPostComment root) {
         bindings.excludeUnlistedProperties(true);

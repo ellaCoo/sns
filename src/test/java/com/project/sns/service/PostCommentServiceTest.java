@@ -1,11 +1,14 @@
 package com.project.sns.service;
 
+import com.project.sns.domain.Notification;
 import com.project.sns.domain.Post;
 import com.project.sns.domain.PostComment;
 import com.project.sns.domain.UserAccount;
+import com.project.sns.domain.constant.NotificationType;
 import com.project.sns.dto.PostCommentDto;
 import com.project.sns.dto.PostDto;
 import com.project.sns.dto.UserAccountDto;
+import com.project.sns.repository.NotificationRepository;
 import com.project.sns.repository.PostCommentRepository;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -22,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +48,8 @@ class PostCommentServiceTest {
     private PostCommentRepository postCommentRepository;
     @Mock
     private UserAccountRepository userAccountRepository;
+    @Mock
+    private NotificationRepository notificationRepository;
 
     @DisplayName("searchPostComments - 포스트 ID로 조회하면, 해당하는 댓글 리스트를 반환한다.")
     @Test
@@ -72,29 +78,41 @@ class PostCommentServiceTest {
         then(postCommentRepository).should().findByPost_Id(postId);
     }
 
-    @DisplayName("deletePostComment - 댓글 ID를 입력하면, 댓글을 삭제한다.")
+    @DisplayName("deletePostComment - 댓글 ID를 입력하면, 댓글과 알림을 삭제한다.")
     @Test
-    void givenPostCommentId_whenDeletingPostComment_thenDeletesPostComment() {
+    void givenPostCommentId_whenDeletingPostComment_thenDeletesPostCommentAndNotification() {
         // Given
         Long postCommentId = 1L;
         String userId = "ella";
-        willDoNothing().given(postCommentRepository).deleteByIdAndUserAccount_userId(postCommentId, userId);
+        PostComment postComment = createPostComment(postCommentId, "content");
+
+        given(postCommentRepository.findByIdAndUserAccount_userId(postCommentId, userId)).willReturn(Optional.of(postComment));
+        willDoNothing().given(postCommentRepository).delete(postComment);
+        willDoNothing().given(notificationRepository).deleteByNotificationTypeAndOccurUserIdAndTargetId(NotificationType.NEW_COMMENT_ON_POST, userId, postCommentId);
 
         // When
         sut.deletePostComment(postCommentId, userId);
 
         // Then
-        then(postCommentRepository).should().deleteByIdAndUserAccount_userId(postCommentId, userId);
+        then(postCommentRepository).should().findByIdAndUserAccount_userId(postCommentId, userId);
+        then(postCommentRepository).should().delete(postComment);
+        then(notificationRepository).should().deleteByNotificationTypeAndOccurUserIdAndTargetId(NotificationType.NEW_COMMENT_ON_POST, userId, postCommentId);
+
+        verify(postCommentRepository, times(1)).delete(postComment);
+        verify(notificationRepository, times(1))
+                .deleteByNotificationTypeAndOccurUserIdAndTargetId(NotificationType.NEW_COMMENT_ON_POST, userId, postCommentId);
     }
 
-    @DisplayName("createPostComment - 부모 댓글 정보를 입력하면, 댓글을 저장한다.")
+    @DisplayName("createPostComment - 부모 댓글 정보를 입력하면, 댓글과 알림을 저장한다.")
     @Test
-    void givenPostCommentInfo_whenSavingPostComment_thenSavesPostComment() {
+    void givenPostCommentInfo_whenSavingPostComment_thenSavesPostCommentAndNotification() {
         // Given
         PostCommentDto dto = createPostCommentDto(null, "comment content");
         given(postRepository.getReferenceById(dto.postId())).willReturn(createPost());
         given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         given(postCommentRepository.save(any(PostComment.class))).willReturn(null);
+        willDoNothing().given(postCommentRepository).flush();
+        given(notificationRepository.save(any(Notification.class))).willReturn(null);
 
         // When
         sut.createPostComment(dto);
@@ -104,6 +122,8 @@ class PostCommentServiceTest {
         then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
         then(postCommentRepository).should(never()).getReferenceById(anyLong());
         then(postCommentRepository).should().save(any(PostComment.class));
+        then(postCommentRepository).should().flush();
+        then(notificationRepository).should().save(any(Notification.class));
     }
 
     @DisplayName("createPostComment - 댓글 저장을 시도했는데 맞는 게시글이 없으면, 경고 로그를 찍고 아무것도 하지 않는다.")
@@ -122,9 +142,9 @@ class PostCommentServiceTest {
         then(postCommentRepository).shouldHaveNoInteractions();
     }
 
-    @DisplayName("createPostComment - 부모 댓글 ID와 댓글 정보를 입력하면, 대댓글을 저장한다.")
+    @DisplayName("createPostComment - 부모 댓글 ID와 댓글 정보를 입력하면, 대댓글과 알림을 저장한다.")
     @Test
-    void givenParentCommentIdAndPostCommentInfo_whenSavingPostComment_thenSavesChildComment() {
+    void givenParentCommentIdAndPostCommentInfo_whenSavingPostComment_thenSavesChildCommentAndNotification() {
         // Given
         Long parentCommentId = 1L;
         PostCommentDto child = createPostCommentDto(parentCommentId, "대댓글");
@@ -133,6 +153,8 @@ class PostCommentServiceTest {
         given(postRepository.getReferenceById(child.postId())).willReturn(createPost());
         given(userAccountRepository.getReferenceById(child.userAccountDto().userId())).willReturn(createUserAccount());
         given(postCommentRepository.getReferenceById(child.postId())).willReturn(parent);
+        willDoNothing().given(postCommentRepository).flush();
+        given(notificationRepository.save(any(Notification.class))).willReturn(null);
 
         // When
         sut.createPostComment(child);
@@ -143,6 +165,8 @@ class PostCommentServiceTest {
         then(userAccountRepository).should().getReferenceById(child.userAccountDto().userId());
         then(postCommentRepository).should().getReferenceById(child.parentCommentId());
         then(postCommentRepository).should(never()).save(any(PostComment.class));
+        then(postCommentRepository).should().flush();
+        then(notificationRepository).should().save(any(Notification.class));
     }
 
 
