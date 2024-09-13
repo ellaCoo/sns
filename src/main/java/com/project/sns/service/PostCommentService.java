@@ -1,9 +1,9 @@
 package com.project.sns.service;
 
-import com.project.sns.domain.Post;
-import com.project.sns.domain.PostComment;
-import com.project.sns.domain.UserAccount;
+import com.project.sns.domain.*;
+import com.project.sns.domain.constant.NotificationType;
 import com.project.sns.dto.PostCommentDto;
+import com.project.sns.repository.NotificationRepository;
 import com.project.sns.repository.PostCommentRepository;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -24,6 +24,9 @@ public class PostCommentService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final UserAccountRepository userAccountRepository;
+    private final NotificationRepository notificationRepository;
+
+    private static final NotificationType NOTI_TYPE = NotificationType.NEW_COMMENT_ON_POST;
 
     @Transactional(readOnly = true)
     public Set<PostCommentDto> searchPostComments(Long postId) {
@@ -34,7 +37,12 @@ public class PostCommentService {
     }
 
     public void deletePostComment(Long commentId, String userId) {
-        postCommentRepository.deleteByIdAndUserAccount_userId(commentId, userId);
+        PostComment postComment = postCommentRepository.findByIdAndUserAccount_userId(commentId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("댓글이 없습니다 - postCommentId: " + commentId));
+        postCommentRepository.delete(postComment);
+
+        // delete notification
+        notificationRepository.deleteByNotificationTypeAndOccurUserIdAndTargetId(NOTI_TYPE, userId, commentId);
     }
 
     public void createPostComment(PostCommentDto dto) {
@@ -49,6 +57,11 @@ public class PostCommentService {
             } else {
                 postCommentRepository.save(postComment);
             }
+            postCommentRepository.flush();
+
+            // create notification
+            Notification notification = Notification.of(post.getUserAccount(), NOTI_TYPE, postComment.getId(), userAccount.getUserId());
+            notificationRepository.save(notification);
         } catch (EntityNotFoundException e) {
             log.warn("댓글 저장 실패. 댓글 작성에 필요한 정보를 찾을 수 없습니다. - {}", e.getLocalizedMessage());
         }

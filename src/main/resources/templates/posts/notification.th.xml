@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<thlogic>
+    <attr sel="#header" th:replace="~{header :: header}" />
+    <attr sel="#footer" th:replace="~{footer :: footer}" />
+
+    <attr sel="main" th:object="${notifications}">
+        <attr sel="#post-list">
+            <attr sel="li[0]" th:each="noti : ${notifications}">
+                <attr sel=".notificationLink" th:href="@{'/posts/notification/' + ${noti.id}}">
+                    <attr sel=".occurUser" th:text="${noti.occurUserNickname}" />
+                    <attr sel=".notificationString" th:text="${noti.notificationString}" />
+                    <attr sel=".created-at/time" th:datetime="${noti.createdAt}" th:text="${#temporals.format(noti.createdAt, 'yyyy-MM-dd HH:mm')}" />
+                </attr>
+            </attr>
+        </attr>
+    </attr>
+</thlogic>
