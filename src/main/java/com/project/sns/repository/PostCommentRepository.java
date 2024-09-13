@@ -15,20 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostCommentRepository extends
-        JpaRepository<PostComment, Long>,
-        QuerydslPredicateExecutor<PostComment>, // entity 안에 있는 모든 필드에 대한 기본 검색 기능 추가
-        QuerydslBinderCustomizer<QPostComment>  // 부분 검색
+        JpaRepository<PostComment, Long>
 {
     List<PostComment> findByPost_Id(Long postId);
 
     Optional<PostComment> findByIdAndUserAccount_userId(Long commentId, String userId);
-
-    @Override
-    default void customize(QuerydslBindings bindings, QPostComment root) {
-        bindings.excludeUnlistedProperties(true);
-        bindings.including(root.content, root.createdAt, root.createdBy);
-        bindings.bind(root.content).first(StringExpression::containsIgnoreCase);
-        bindings.bind(root.createdAt).first(DateTimeExpression::eq);
-        bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
-    }
 }
