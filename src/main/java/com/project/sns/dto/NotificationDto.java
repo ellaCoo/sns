@@ -11,25 +11,25 @@ public record NotificationDto(
         UserAccountDto userAccountDto,
         NotificationType notificationType,
         Long targetId,
-        String occurUserId,
+        UserAccountDto occurUserAccountDto,
         LocalDateTime createdAt,
         String createdBy
 ) {
-    public static NotificationDto of(UserAccountDto userAccountDto, NotificationType notificationType, Long targetId, String occurUserId) {
-        return NotificationDto.of(null, userAccountDto, notificationType, targetId, occurUserId, null, null);
+    public static NotificationDto of(UserAccountDto userAccountDto, NotificationType notificationType, Long targetId, UserAccountDto occurUserAccountDto) {
+        return NotificationDto.of(null, userAccountDto, notificationType, targetId, occurUserAccountDto, null, null);
     }
 
-    public static NotificationDto of(Long id, UserAccountDto userAccountDto, NotificationType notificationType, Long targetId, String occurUserId, LocalDateTime createdAt, String createdBy) {
-        return new NotificationDto(id, userAccountDto, notificationType, targetId, occurUserId, createdAt, createdBy);
+    public static NotificationDto of(Long id, UserAccountDto userAccountDto, NotificationType notificationType, Long targetId, UserAccountDto occurUserAccountDto, LocalDateTime createdAt, String createdBy) {
+        return new NotificationDto(id, userAccountDto, notificationType, targetId, occurUserAccountDto, createdAt, createdBy);
     }
 
-    public static NotificationDto fromEntity(Notification entity) {
+    public static NotificationDto fromEntity(Notification entity, UserAccount occurUserAccount) {
         return new NotificationDto(
                 entity.getId(),
                 UserAccountDto.fromEntity(entity.getUserAccount()),
                 entity.getNotificationType(),
                 entity.getTargetId(),
-                entity.getOccurUserId(),
+                UserAccountDto.fromEntity(occurUserAccount),
                 entity.getCreatedAt(),
                 entity.getCreatedBy()
         );

@@ -2,16 +2,15 @@ package com.project.sns.controller;
 
 import com.project.sns.domain.constant.FormStatus;
 import com.project.sns.dto.HashtagDto;
+import com.project.sns.dto.NotificationDto;
 import com.project.sns.dto.PostDto;
 import com.project.sns.dto.request.PostRequest;
+import com.project.sns.dto.response.NotificationResponse;
 import com.project.sns.dto.response.PostResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
 import com.project.sns.dto.security.SnsPrincipal;
-import com.project.sns.service.HashtagService;
-import com.project.sns.service.PostCommentService;
-import com.project.sns.service.PostService;
-import com.project.sns.service.UserAccountService;
+import com.project.sns.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +31,7 @@ public class PostController {
 
     private final PostService postService;
     private final HashtagService hashtagService;
+    private final NotificationService notificationService;
 
     private Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
     @GetMapping
@@ -185,5 +185,27 @@ public class PostController {
         Page<PostWithLikesAndHashtagsResponse> response = postService.getPostsByHashtagName(hashtagName, pageable.withPage(page))
                 .map(res -> PostWithLikesAndHashtagsResponse.fromDto(res, user));
         return response;
+    }
+
+    @GetMapping("/notification")
+    public String notification(
+            @AuthenticationPrincipal SnsPrincipal snsPrincipal,
+            ModelMap map
+    ) {
+        List<NotificationResponse> response = notificationService
+                .getNotifications(snsPrincipal.toDto()).stream()
+                .map(NotificationResponse::fromDto)
+                .collect(Collectors.toList());
+        map.addAttribute("notifications", response);
+        return "posts/notification";
+    }
+
+    @GetMapping("/notification/{notificationId}")
+    public String postsByHashtagPage(
+            @PathVariable Long notificationId,
+            ModelMap map
+    ) {
+        Long postId = notificationService.getPostIdById(notificationId);
+        return "redirect:/posts/" + postId;
     }
 }
