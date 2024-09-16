@@ -1,10 +1,9 @@
 package com.project.sns.service;
 
-import com.project.sns.domain.Hashtag;
-import com.project.sns.domain.Post;
-import com.project.sns.domain.PostHashtag;
-import com.project.sns.domain.UserAccount;
+import com.project.sns.domain.*;
+import com.project.sns.domain.constant.NotificationType;
 import com.project.sns.dto.*;
+import com.project.sns.repository.NotificationRepository;
 import com.project.sns.repository.PostHashtagRepository;
 import com.project.sns.repository.PostRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -29,6 +28,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostHashtagRepository postHashtagRepository;
     private final HashtagService hashtagService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public Page<PostWithLikesAndHashtagsDto> getPosts(Pageable pageable) {
@@ -97,6 +97,7 @@ public class PostService {
         Post post = postRepository.getReferenceById(postId);
         Set<Long> originHashtagIds = post.getPostHashtags().stream().map(PostHashtag::getHashtag).map(Hashtag::getId).collect(Collectors.toSet());
 
+        notificationService.deleteNotificationByPostId(postId);
         postRepository.deleteByIdAndUserAccount_UserId(postId, userId);
         postRepository.flush();
         hashtagService.deleteUnusedHashtags(originHashtagIds);

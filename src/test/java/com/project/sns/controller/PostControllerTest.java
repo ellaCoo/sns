@@ -10,6 +10,7 @@ import com.project.sns.dto.response.PostResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagAndCommentsResponse;
 import com.project.sns.dto.response.PostWithLikesAndHashtagsResponse;
 import com.project.sns.service.HashtagService;
+import com.project.sns.service.NotificationService;
 import com.project.sns.service.PostCommentService;
 import com.project.sns.service.PostService;
 import com.project.sns.util.FormDataEncoder;
@@ -50,9 +51,9 @@ class PostControllerTest {
     @MockBean // ->MockBean이 생성자 주입 지원하지 않음
     private PostService postService;
     @MockBean
-    private PostCommentService postCommentService;
-    @MockBean
     private HashtagService hashtagService;
+    @MockBean
+    private NotificationService notificationService;
 
     // 생성자주입
     PostControllerTest(
@@ -125,7 +126,6 @@ class PostControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
         then(postService).shouldHaveNoInteractions(); // postService 모의 객체가 테스트 중에 어떤 메서드도 호출되지 않았음을 확인
-        then(postCommentService).shouldHaveNoInteractions();
     }
 
     @WithMockUser // user정보를 모킹해서 넣어줌

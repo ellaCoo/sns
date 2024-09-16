@@ -42,6 +42,8 @@ public class PostServiceTest {
     private HashtagService hashtagService;
     @Mock
     private PostHashtagRepository postHashtagRepository;
+    @Mock
+    private NotificationService notificationService;
 
     @DisplayName("getPosts - 페이징 정보를 넘기면 페이징 처리하여 반환한다.")
     @Test
@@ -214,6 +216,7 @@ public class PostServiceTest {
         Long postId = 1L;
         String userId = "ella";
         given(postRepository.getReferenceById(postId)).willReturn(createPost(postId));
+        willDoNothing().given(notificationService).deleteNotificationByPostId(postId);
         willDoNothing().given(postRepository).deleteByIdAndUserAccount_UserId(postId, userId);
         willDoNothing().given(postRepository).flush();
         willDoNothing().given(hashtagService).deleteUnusedHashtags(any());
@@ -222,6 +225,7 @@ public class PostServiceTest {
         sut.deletePost(1L, userId);
 
         // Then
+        then(notificationService).should().deleteNotificationByPostId(postId);
         then(postRepository).should().getReferenceById(postId);
         then(postRepository).should().deleteByIdAndUserAccount_UserId(postId, userId);
         then(postRepository).should().flush();
