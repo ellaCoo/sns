@@ -3,7 +3,7 @@ html {
     justify-content: center;
 }
 body {
-    width: 50%;
+    width: 40%;
     overflow: hidden;
 }
 main {
@@ -11,7 +11,7 @@ main {
     height : 75vh;
 }
 .iconBtn img{
-    width: 45px;
+    width: 35px;
     height: auto;
 }
 .iconSmallBtn img {
