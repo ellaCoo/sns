@@ -1,8 +1,12 @@
 package com.project.sns.service;
 
+import com.project.sns.domain.Like;
 import com.project.sns.domain.Post;
+import com.project.sns.domain.PostComment;
 import com.project.sns.domain.UserAccount;
+import com.project.sns.domain.constant.NotificationType;
 import com.project.sns.dto.NotificationDto;
+import com.project.sns.dto.PostDto;
 import com.project.sns.dto.UserAccountDto;
 import com.project.sns.repository.NotificationRepository;
 import com.project.sns.repository.UserAccountRepository;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,5 +47,9 @@ public class NotificationService {
         Post post = notificationRepository.findPostByNotificationId(id)
                 .orElseThrow(() -> new EntityNotFoundException("알림에 해당하는 포스트를 찾을 수 없습니다 - notiId: " + id));
         return post.getId();
+    }
+
+    public void deleteNotificationByPostId(Long postId) {
+        notificationRepository.deleteNotificationByPostId(postId);
     }
 }
