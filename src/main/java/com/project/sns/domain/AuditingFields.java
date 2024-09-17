@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -17,6 +18,7 @@ BaseTimeEntity는 모든 Entity의 상위클래스가 되어 Entity들의 create
 Jpa Entity들이 @MappedSuperClass가 선언된 클래스를 상속할 경우, 클래스의 필드를 컬럼으로 인식하도록 함
  */
 @Getter
+@ToString
 @EntityListeners(AuditingEntityListener.class) //BaseTimeEntity에 Auditing 기능을 포함
 @MappedSuperclass
 public abstract class AuditingFields { // 직접 생성해서 사용할 일 없으므로 추상클래스로 생성
