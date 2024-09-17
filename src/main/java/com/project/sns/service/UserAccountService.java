@@ -19,20 +19,18 @@ public class UserAccountService {
 
     @Transactional(readOnly = true)
     public Optional<UserAccountDto> searchUser(String username) {
-        var userEntityCache = userAccountCacheRepository.getUserAccountCache(username);
-
-        if (userEntityCache.isPresent()) {
-            return userEntityCache.map(UserAccountDto::fromEntity);
-        } else {
-            Optional<UserAccount> userAccount = userAccountRepository.findById(username);
-            userAccountCacheRepository.setUserAccountCache(userAccount.get());
-            return userAccount.map(UserAccountDto::fromEntity);
-        }
+        return userAccountCacheRepository.getUserAccountCache(username)
+                .or(() -> userAccountRepository.findById(username)
+                        .map(userAccount -> {
+                            userAccountCacheRepository.setUserAccountCache(userAccount);
+                            return userAccount;
+                        }))
+                .map(UserAccountDto::fromEntity);
     }
 
     public UserAccountDto saveUser(String username, String password, String email, String nickname, String memo) {
-        return UserAccountDto.fromEntity(
-                userAccountRepository.save(UserAccount.of(username, password, email, nickname, memo, username))
-        );
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of(username, password, email, nickname, memo, username));
+        userAccountCacheRepository.setUserAccountCache(userAccount);
+        return UserAccountDto.fromEntity(userAccount);
     }
 }
