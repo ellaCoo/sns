@@ -1,7 +1,10 @@
 # SNS
 
-## Application Architecture
-![SystemArchitecture.drawio.svg](doc%2FSystemArchitecture.drawio.svg)
+## Service Architecture
+![서비스 아키텍처](https://github.com/user-attachments/assets/8dd109ef-5b00-43a6-9650-95a8bf08e29c)
+
+## Infra Architecture
+![인프라 아키텍처](https://github.com/user-attachments/assets/d9414c17-73d5-4704-bf0c-3e950d98f73f)
 
 ## Flow Chart
 
